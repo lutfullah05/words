@@ -1,0 +1,16 @@
+{
+  "name": "WorldsWord2",
+  "short_name": "WW2",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0D47A1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "worldsword2-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
