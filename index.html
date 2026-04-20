@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alan 12">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D47A1">
+<link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="worldsword2-icon.png">
+<link rel="icon" type="image/svg+xml" href="worldsword2-icon.png">
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+window.firestoreFunctions = { doc, setDoc, getDoc };
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCV8pCQQMUP58eTOwx_wDhokqjxz5-eAZU",
+  authDomain: "words-fc573.firebaseapp.com",
+  projectId: "words-fc573",
+  storageBucket: "words-fc573.firebasestorage.app",
+  messagingSenderId: "772235956572",
+  appId: "1:772235956572:web:11529bd4e198011ff8b199",
+  measurementId: "G-68ZZFRQK7F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  window.firebaseAuth = auth;
+  window.firebaseDb = db;
+  window.GoogleAuthProvider = GoogleAuthProvider;
+  window.signInWithPopup = signInWithPopup;
+  window.signOut = signOut;
+  window.onAuthStateChanged = onAuthStateChanged;
+</script>
+<title>ALAN 12 • TRUE ZEN v4</title>
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+html, body {
+    height: 100%;
+    height: -webkit-fill-available;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+body {
+    position: fixed;
+    width: 100%;
+    font-size: clamp(14px, 4vw, 18px);
+}
+.container {
+    height: 100vh;
+    height: 100dvh;
+    height: -webkit-fill-available;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 0 clamp(8px, 3vw, 20px);
+    box-sizing: border-box;
+}
+/* iOS safe area padding */
+.nav-tabs {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+.app-wrapper {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+:root {
+    --bg:#0d1117; --card:#161b22; --border:#30363d;
+    --accent:#58a6ff; --success:#238636; --error:#da3633; --warn:#d29922;
+    --text:#c9d1d9; --subtext:#8b949e;
+}
+body.light {
+    --bg:#f6f8fa; --card:#ffffff; --border:#d0d7de;
+    --accent:#0969da; --success:#1a7f37; --error:#cf222e; --warn:#9a6700;
+    --text:#24292f; --subtext:#57606a;
+}
+* { box-sizing: border-box; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,sans-serif; margin:0; overflow-x:hidden; transition: background 0.3s, color 0.3s; }
+
+/* HEADER */
+.header { background:var(--card); width:100%; padding:12px 15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+.header-title { font-weight:bold; font-size:1rem; }
+.header-btns { display:flex; gap:8px; }
+.icon-btn { background:var(--border); border:none; color:var(--text); padding:5px 10px; border-radius:8px; cursor:pointer; font-size:1rem; }
+
+.container { width:95%; max-width:900px; padding: clamp(10px, 4vw, 20px); margin:0 auto; }
+@media (min-width: 700px) {
+    .opt { font-size:1.1rem; padding:14px; }
+    .word-display { font-size:2.8rem; }
+    body { font-size: clamp(14px, 1.5vw, 18px); }
+}
+
+/* NAV TABS */
+.nav-tabs { display:flex; gap:0; margin-bottom:15px; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.nav-tab { flex:1; padding: clamp(10px,3vw,14px); background:transparent; border:none; color:var(--subtext); font-weight:bold; font-size:0.85rem; cursor:pointer; transition:0.2s; }
+.nav-tab.active { background:var(--accent); color:white; }
+
+/* SCREENS */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* MODE ROW */
+.mode-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:15px; }
+.m-btn { padding: clamp(10px,3vw,14px); border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; color:var(--subtext); background:var(--card); transition:0.3s; }
+.m-btn.active { background:var(--accent); color:white; border-color:var(--accent); }
+
+/* DIFFICULTY */
+.diff-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:5px; margin-bottom:15px; }
+.d-btn { padding: clamp(8px,2.5vw,12px); border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; color:var(--subtext); background:var(--card); transition:0.3s; }
+.d-btn.active { color:white; border-color:currentColor; }
+.d-btn[data-d="easy"].active  { background:#238636; }
+.d-btn[data-d="mid"].active   { background:#d29922; color:#000; }
+.d-btn[data-d="hard"].active  { background:#da3633; }
+.d-btn[data-d="lightning"].active { background:linear-gradient(135deg,#f5a623,#f53d23); color:#fff; }
+@keyframes lightning-flash {
+    0%,100% { background:var(--card); }
+    50% { background:rgba(245,166,35,0.15); }
+}
+.lightning-mode { animation: lightning-flash 0.5s infinite; }
+
+select { width:100%; padding: clamp(11px,3.5vw,16px); background:var(--card); color:var(--accent); border:2px solid var(--accent); border-radius:12px; margin-bottom:15px; font-size:1.1rem; font-weight:bold; outline:none; }
+.btn { background:var(--card); border:1px solid var(--border); color:var(--text); padding: clamp(11px,3.5vw,16px); border-radius:12px; cursor:pointer; font-weight:bold; width:100%; margin-bottom:8px; font-size:1rem; transition:0.2s; }
+.btn:hover { border-color:var(--accent); }
+.btn-main { background:var(--success); border:none; font-size:1.1rem; color:white; }
+.btn-accent { color:var(--accent); }
+.btn-error { color:var(--error); background:#3a1a1a; }
+.btn-warn { color:var(--warn); }
+.btn-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+/* GAME SCREEN */
+.game-top { display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; margin-bottom:5px; font-weight:bold; }
+.streak-badge { background:var(--warn); color:#000; padding:2px 8px; border-radius:20px; font-size:0.85rem; font-weight:bold; display:none; }
+.timer-row { display:flex; align-items:center; gap:10px; margin:8px 0; }
+.timer-cont { flex-grow:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+#timerBar { width:100%; height:100%; background:var(--accent); transition:width 0.1s linear; }
+.question-label { font-size:0.85rem; font-weight:bold; color:var(--subtext); text-transform:uppercase; letter-spacing:2px; margin-bottom:4px; text-align:center; }
+.word-display { font-size:2.2rem; font-weight:bold; margin:8px 0 4px 0; color:var(--text); min-height:50px; text-align:center; line-height:1.2; }
+.answer-label { font-size:0.85rem; font-weight:bold; color:var(--accent); text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; text-align:center; }
+.opt { background:var(--card); border:1px solid var(--border); color:var(--text); padding:16px; border-radius:15px; cursor:pointer; font-size:1.15rem; font-weight:bold; width:100%; margin-bottom:8px; transition:0.1s; text-align:center; }
+.opt:hover { border-color:var(--accent); }
+.correct { background:var(--success) !important; border-color:#3fb950 !important; color:white !important; }
+.wrong   { background:var(--error)   !important; border-color:#f85149 !important; color:white !important; }
+.reveal  { background:#1f3a5f !important; border-color:var(--accent) !important; color:var(--accent) !important; }
+#manualNext { display:none; background:var(--warn); color:black; padding: clamp(11px,3.5vw,16px); border-radius:12px; font-weight:bold; width:100%; margin-top:8px; cursor:pointer; border:none; }
+
+/* STATS SCREEN */
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding: clamp(10px, 4vw, 20px); margin-bottom:12px; }
+.stat-title { font-size:0.9rem; color:var(--subtext); margin-bottom:8px; font-weight:bold; text-transform:uppercase; }
+.stat-big { font-size:2.2rem; font-weight:bold; color:var(--accent); }
+.stat-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
+.stat-mini { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
+.stat-mini .val { font-size:1.5rem; font-weight:bold; }
+.stat-mini .lbl { font-size:0.75rem; color:var(--subtext); margin-top:2px; }
+.bar-wrap { margin-bottom:6px; }
+.bar-label { display:flex; justify-content:space-between; font-size:0.85rem; color:var(--subtext); margin-bottom:2px; }
+.bar-bg { background:var(--border); border-radius:4px; height:10px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; transition:width 0.6s; }
+
+/* WORD LIST SCREEN */
+.word-list-item { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--border); font-size:0.95rem; }
+.word-list-item:last-child { border-bottom:none; }
+.wl-en { font-weight:bold; color:var(--text); }
+.wl-tr { color:var(--subtext); font-size:0.9rem; margin-top:2px; }
+.wl-del { background:none; border:none; color:var(--error); cursor:pointer; font-size:1.1rem; padding:4px 8px; }
+.wl-edit { background:none; border:none; color:var(--accent); cursor:pointer; font-size:1rem; padding:4px 8px; }
+.search-box { width:100%; padding: clamp(10px,3vw,14px); background:var(--card); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; margin-bottom:10px; outline:none; }
+.wl-container { background:var(--card); border:1px solid var(--border); border-radius:12px; max-height:60vh; overflow-y:auto; }
+
+/* EDIT MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; justify-content:center; align-items:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; width:90%; max-width:600px; }
+.modal h3 { margin:0 0 15px 0; font-size:1.1rem; }
+.modal input { width:100%; padding: clamp(10px,3vw,14px); background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:1rem; margin-bottom:10px; outline:none; }
+.modal-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+/* DATA SCREEN */
+textarea { width:100%; height:90px; background:var(--bg); color:var(--accent); border:1px solid var(--border); border-radius:8px; font-size:0.85rem; padding: clamp(8px,2.5vw,12px); font-family:monospace; resize:vertical; }
+
+/* MOT */
+#mot { position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); font-size:3.5rem; pointer-events:none; opacity:0; transition:0.5s; z-index:1000; }
+.show-mot { opacity:1 !important; transform:translate(-50%,-60%) scale(1.5) !important; }
+
+/* PAUSE BTN */
+.pause-btn { background:var(--border); border:none; color:var(--text); padding:3px 9px; border-radius:7px; cursor:pointer; font-size:0.9rem; }
+</style>
+</head>
+<body>
+<div class="app-wrapper" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)">
+
+<div id="mot">🔥</div>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-title" id="hT">ALAN 12 • TRUE ZEN v4</div>
+    <div class="header-btns" style="display:flex;align-items:center;gap:8px;">
+        <span id="user-name" style="font-size:0.85rem;color:var(--subtext);"></span>
+        <button id="login-btn" onclick="googleGiris()" style="background:#4285f4;color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:bold;">🔑 Giriş</button>
+        <button id="logout-btn" onclick="googleCikis()" style="display:none;background:#e53935;color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:bold;">Çıkış</button>
+        <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Ses">🔊</button>
+        <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Tema">🌙</button>
+        <button class="icon-btn" id="homeBtn" style="display:none;" onclick="goHome()">🏠</button>
+    </div>
+</div>
+
+<!-- MAIN MENU -->
+<div class="container screen active" id="menuScreen">
+    <!-- NAV -->
+    <div id="installBtn" onclick="installApp()" style="display:none;width:100%;padding: clamp(10px,3vw,14px);background:linear-gradient(135deg,#58a6ff,#3fb950);color:white;border:none;border-radius:10px;font-size:0.95rem;font-weight:bold;cursor:pointer;margin-bottom:10px;text-align:center">
+        📲 Ana Ekrana Ekle (Uygulama Olarak Aç)
+    </div>
+    <div class="nav-tabs" style="display:flex;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+        <button class="nav-tab active" onclick="showTab('play')">🎮 OYNA</button>
+        <button class="nav-tab" onclick="showTab('stats')">📊 İSTATİSTİK</button>
+        <button class="nav-tab" onclick="showTab('words')">📚 KELİMELER</button>
+        <button class="nav-tab" onclick="showTab('data')">⚙️ VERİ</button>
+        <button class="nav-tab" onclick="showTab('duel')">⚔️ DÜELLO</button>
+    </div>
+
+    <!-- PLAY TAB -->
+    <div id="tab-play">
+        <div class="mode-row">
+            <button id="m_learn" class="m-btn active" onclick="setMode('learn')">🎓 ÖĞRETİCİ</button>
+            <button id="m_exam"  class="m-btn" onclick="setMode('exam')">🏆 SINAV</button>
+            <button id="m_zen"   class="m-btn" onclick="setMode('zen')">🧘 ZEN</button>
+        </div>
+        <div style="margin-bottom:8px; font-size:0.85rem; color:var(--subtext); font-weight:bold; text-transform:uppercase; letter-spacing:1px;">ZORluk</div>
+        <div class="diff-row">
+            <button class="d-btn active" data-d="easy" onclick="setDiff('easy')">🟢 KOLAY<br><span style="font-size:0.7rem;font-weight:normal">90sn</span></button>
+            <button class="d-btn" data-d="mid"  onclick="setDiff('mid')">🟡 ORTA<br><span style="font-size:0.7rem;font-weight:normal">50sn</span></button>
+            <button class="d-btn" data-d="hard" onclick="setDiff('hard')">🔴 ZOR<br><span style="font-size:0.7rem;font-weight:normal">25sn</span></button>
+            <button class="d-btn" data-d="lightning" onclick="setDiff('lightning')">⚡ ŞİMŞEK<br><span style="font-size:0.7rem;font-weight:normal">5sn</span></button>
+        </div>
+        <select id="dayPicker"></select>
+        <button class="btn btn-main" id="startBtn" onclick="start('day')">▶ DERSİ BAŞLAT</button>
+        <button class="btn btn-accent" onclick="start('smart')">🌀 AKILLI TEKRAR</button>
+        <button id="failBtn" class="btn" style="color:var(--error); display:none;" onclick="start('fails')"></button>
+    </div>
+
+    <!-- STATS TAB -->
+    <div id="tab-stats" style="display:none;">
+        <div class="stat-row">
+            <div class="stat-mini"><div class="val" id="st-total" style="color:var(--accent)">0</div><div class="lbl">KELİME</div></div>
+            <div class="stat-mini"><div class="val" id="st-done"  style="color:var(--success)">0</div><div class="lbl">TAMAMLANAN GÜN</div></div>
+            <div class="stat-mini"><div class="val" id="st-fails" style="color:var(--error)">0</div><div class="lbl">HATA</div></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">📈 DOĞRULUK ORANI</div>
+            <div class="stat-big" id="st-acc">-%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">🔥 EN UZUN STREAK</div>
+            <div class="stat-big" id="st-streak">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">📅 GÜN İLERLEMESİ</div>
+            <div id="st-days-bar"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:80px;">
+            <button class="btn btn-error" style="flex:1" onclick="clearFails()">❌ HATALARI TEMİZLE</button>
+            <button class="btn btn-error" style="flex:1;opacity:0.7" onclick="resetStats()">🗑️ TÜMÜNÜ SIFIRLA</button>
+        </div>
+    </div>
+
+    <!-- WORDS TAB -->
+    <div id="tab-words" style="display:none;">
+        <input class="search-box" id="wordSearch" placeholder="🔍 Kelime ara..." oninput="renderWordList()">
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+            <select id="dayFilter" onchange="renderWordList()" style="flex:1; padding: clamp(8px,2.5vw,12px); background:var(--card); color:var(--accent); border:1px solid var(--border); border-radius:8px; font-size:0.9rem; font-weight:bold; outline:none; min-width:120px; margin-bottom:0;">
+                <option value="">📅 Tüm günler</option>
+            </select>
+            <div style="font-size:0.9rem; color:var(--subtext); font-weight:bold; white-space:nowrap;" id="wordCount"></div>
+        </div>
+        <div class="wl-container" id="wordListBox"></div>
+    </div>
+
+    <!-- DATA TAB -->
+    <div id="tab-data" style="display:none;">
+        <textarea id="rawBox" placeholder="Kelime listesi (her satıra bir kelime):&#10;word=anlam&#10;low-carbohydrate=düşük karbonhidratlı"></textarea>
+        <div class="btn-grid2" style="margin-top:8px;">
+            <button class="btn" style="font-size:0.85rem;" onclick="saveRaw()">➕ KELİME EKLE</button>
+            <button id="bkBtn" class="btn btn-warn" style="font-size:0.85rem;" onclick="getBackup()">💾 YEDEK AL</button>
+            <button class="btn" style="font-size:0.85rem; grid-column:span 2;" onclick="restoreBackup()">📥 YEDEK GERİ YÜKLE</button>
+            <button class="btn btn-error" style="font-size:0.85rem; grid-column:span 2;" onclick="clearAll()">🗑️ TÜM VERİYİ SİL</button>
+        </div>
+    </div>
+
+    <!-- DUEL TAB -->
+    <div id="tab-duel" style="display:none;">
+
+        <!-- Düello mod seçimi -->
+        <div id="duelModeSelect" style="margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                <button class="btn" onclick="showDuelMode('local')" style="background:var(--card);border:2px solid var(--accent);color:var(--accent);font-weight:bold">📱 Yerel Düello<br><span style="font-size:0.75rem;font-weight:normal;color:var(--subtext)">Aynı cihazda</span></button>
+                <button class="btn" onclick="showDuelMode('online')" style="background:var(--accent);border:2px solid var(--accent);color:white;font-weight:bold">🌐 Online Düello<br><span style="font-size:0.75rem;font-weight:normal;opacity:0.8">Farklı cihazlarda</span></button>
+            </div>
+        </div>
+
+        <!-- Online Düello Kurulum -->
+        <div id="onlineDuelSetup" style="">
+            <div style="font-size:1.1rem;font-weight:bold;margin-bottom:12px;text-align:center">🌐 ONLİNE DÜELLO</div>
+            <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold"><!-- Kelime Havuzu Seçimi -->
+<div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold;">KELİME HAVUZU</div>
+<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+    <button class="d-btn active" data-pool="mixed" onclick="setDuelPool('mixed')">🔀 Karışık</button>
+    <button class="d-btn" data-pool="learned" onclick="setDuelPool('learned')">✅ Öğrenilen</button>
+    <button class="d-btn" data-pool="daily" onclick="setDuelPool('daily')">📅 Güne Göre</button>
+</div>
+
+<!-- Zorluk Seçimi -->
+<div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold;">ZORLUK</div>
+<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+    <button class="d-btn active" data-diff="easy" onclick="setDuelDiff('easy')">🟢 Kolay</button>
+    <button class="d-btn" data-diff="mid" onclick="setDuelDiff('mid')">🟡 Orta</button>
+    <button class="d-btn" data-diff="hard" onclick="setDuelDiff('hard')">🔴 Zor</button>
+    <button class="d-btn" data-diff="lightning" onclick="setDuelDiff('lightning')">⚡ Şimşek</button>
+</div>GÜN SEÇ</div>
+            <select id="onlineDuelDay" style="width:100%;padding:12px;background:var(--card);color:var(--accent);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;font-size:1rem;font-weight:bold"></select>
+            <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">SORU SAYISI</div>
+            <div style="display:flex;gap:6px;margin-bottom:14px">
+                <button class="d-btn active" data-odq="10" onclick="setOnlineDuelQ(10)">10</button>
+                <button class="d-btn" data-odq="20" onclick="setOnlineDuelQ(20)">20</button>
+                <button class="d-btn" data-odq="30" onclick="setOnlineDuelQ(30)">30</button>
+            </div>
+            <button class="btn btn-main" onclick="createOnlineRoom()" style="margin-bottom:8px">🏠 Oda Oluştur</button>
+            <div style="text-align:center;color:var(--subtext);font-size:0.85rem;margin:8px 0">— veya —</div>
+            <input id="joinRoomCode" class="search-box" placeholder="Oda kodu gir (örn: AB3X)" style="text-transform:uppercase;margin-bottom:8px">
+            <button class="btn" onclick="joinOnlineRoom()" style="color:var(--accent);border-color:var(--accent)">🚪 Odaya Katıl</button>
+        </div>
+
+        <!-- Online Bekleme Odası -->
+        <div id="onlineWaiting" style="display:none;text-align:center;padding:20px 0">
+            <div style="font-size:3rem;margin-bottom:10px">⏳</div>
+            <div style="font-size:1.1rem;font-weight:bold;margin-bottom:8px">Oda Kodu:</div>
+            <div id="roomCodeDisplay" style="font-size:3rem;font-weight:bold;color:var(--accent);letter-spacing:8px;margin-bottom:12px"></div>
+            <div style="font-size:0.9rem;color:var(--subtext);margin-bottom:16px">Bu kodu arkadaşına gönder!</div>
+            <div id="waitingStatus" style="font-size:0.95rem;color:var(--warn)">Rakip bekleniyor...</div>
+            <div id="waitingPlayers" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
+            <button id="startOnlineBtn" class="btn btn-main" onclick="hostStartGame()" style="display:none;margin-top:12px">▶ Oyunu Başlat</button>
+            <div style="font-size:0.8rem;color:var(--subtext);margin-top:6px">Maksimum 5 oyuncu</div>
+            <button class="btn btn-error" onclick="cancelOnlineRoom()" style="margin-top:10px;width:auto;padding:8px 20px">İptal</button>
+        </div>
+
+        <!-- Online Oyun Ekranı -->
+        <div id="onlineGame" style="display:none;">
+            <!-- Dinamik skor bandı (2-5 oyuncu) -->
+            <div id="og-scoreBand" style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px"></div>
+            <!-- Timer bar -->
+            <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px">
+                <div id="og-timerBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width .1s linear;width:100%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <div id="og-prog" style="font-size:0.85rem;color:var(--subtext)"></div>
+                <div id="og-timer" style="font-size:1.1rem;font-weight:bold;color:var(--accent)"></div>
+            </div>
+            <div style="font-size:0.85rem;color:var(--subtext);font-weight:bold;margin-bottom:4px" id="og-qLabel">🔤 İNGİLİZCE</div>
+            <div id="og-word" style="font-size:clamp(1.3rem,5vw,2rem);font-weight:bold;margin:8px 0 14px;text-align:center;line-height:1.3"></div>
+            <div id="og-opts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+            <div id="og-status" style="text-align:center;margin-top:10px;font-size:0.9rem;color:var(--warn);min-height:24px"></div>
+        </div>
+
+        <!-- Online Sonuç -->
+        <div id="onlineResult" style="display:none;text-align:center;padding:10px 0">
+            <div id="og-winnerIcon" style="font-size:3rem;margin-bottom:8px"></div>
+            <div id="og-winnerText" style="font-size:1.3rem;font-weight:bold;color:var(--accent);margin-bottom:16px"></div>
+            <div id="og-scoreBoard" style="margin-bottom:16px"></div>
+            <button class="btn btn-main" onclick="showDuelMode('online')">🔄 Tekrar Oyna</button>
+        </div>
+
+        <div class="card" id="duelSetup" style="display:none;">
+            <div style="font-size:1.2rem;font-weight:bold;margin-bottom:12px;text-align:center">📱 YEREL DÜELLO</div>
+            <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">OYUNCU 1 İSMİ</div>
+            <input id="p1name" class="search-box" placeholder="Oyuncu 1" style="margin-bottom:10px" value="Oyuncu 1">
+            <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">OYUNCU 2 İSMİ</div>
+            <input id="p2name" class="search-box" placeholder="Oyuncu 2" style="margin-bottom:10px" value="Oyuncu 2">
+            <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">GÜN SEÇ</div>
+            <select id="duelDay" style="width:100%;padding: clamp(10px,3vw,14px);background:var(--card);color:var(--accent);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;font-size:1rem;font-weight:bold"></select>
+            <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">SORU SAYISI</div>
+            <div style="display:flex;gap:6px;margin-bottom:14px">
+                <button class="d-btn active" data-dq="10" onclick="setDuelQ(10)">10 soru</button>
+                <button class="d-btn" data-dq="20" onclick="setDuelQ(20)">20 soru</button>
+                <button class="d-btn" data-dq="30" onclick="setDuelQ(30)">30 soru</button>
+            </div>
+            <button class="btn" onclick="startDuel()" style="width:100%;padding: clamp(12px,3.5vw,18px);background:var(--accent);color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:bold;cursor:pointer">⚔️ DÜELLOYU BAŞLAT</button>
+        </div>
+
+        <!-- Oyuncu sırası ekranı -->
+        <div id="duelTurn" style="display:none;" class="card">
+            <div style="text-align:center;padding:20px 0">
+                <div style="font-size:2.5rem;margin-bottom:10px">🎮</div>
+                <div id="duelTurnName" style="font-size:clamp(1.3rem,5vw,1.8rem);font-weight:bold;color:var(--accent)"></div>
+                <div style="font-size:0.95rem;color:var(--subtext);margin:8px 0">Hazır olduğunda başla!</div>
+                <button onclick="beginPlayerTurn()" style="margin-top:12px;padding:14px 40px;background:var(--accent);color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:bold;cursor:pointer">▶ BAŞLA</button>
+            </div>
+        </div>
+
+        <!-- Oyun ekranı -->
+        <div id="duelGame" style="display:none;" class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div id="duelPlayerLabel" style="font-size:0.9rem;font-weight:bold;color:var(--accent)"></div>
+                <div id="duelProg" style="font-size:0.9rem;color:var(--subtext)"></div>
+                <div id="duelTimer" style="font-size:1.2rem;font-weight:bold;color:var(--accent);min-width:36px;text-align:right"></div>
+            </div>
+            <div class="t-row" style="margin-bottom:10px">
+                <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+                    <div id="duelTimerBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width .1s linear;width:100%"></div>
+                </div>
+            </div>
+            <div style="font-size:0.85rem;color:var(--subtext);font-weight:bold;margin-bottom:4px" id="duelQLabel">🔤 İNGİLİZCE</div>
+            <div id="duelWord" style="font-size:clamp(1.3rem,5vw,1.8rem);font-weight:bold;margin:8px 0 14px;line-height:1.3"></div>
+            <div style="font-size:0.85rem;color:var(--subtext);font-weight:bold;margin-bottom:8px" id="duelALabel">▼ TÜRKÇE KARŞILIĞI ▼</div>
+            <div id="duelOpts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+        </div>
+
+        <!-- Sonuç ekranı -->
+        <div id="duelResult" style="display:none;" class="card">
+            <div style="text-align:center;margin-bottom:16px">
+                <div id="duelWinnerIcon" style="font-size:3rem;margin-bottom:8px"></div>
+                <div id="duelWinnerText" style="font-size:1.3rem;font-weight:bold;color:var(--accent)"></div>
+            </div>
+            <div id="duelScoreBoard" style="margin-bottom:16px"></div>
+            <button onclick="initDuel()" style="width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer">🔄 YENİDEN OYNA</button>
+        </div>
+    </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="container screen" id="gameScreen">
+    <div class="game-top">
+        <div id="prog" style="color:var(--accent)"></div>
+        <div id="streakBadge" class="streak-badge">🔥 0</div>
+        <div id="errCounter" style="color:var(--error)"></div>
+    </div>
+    <div class="timer-row" id="tRow" style="display:none;">
+        <div class="timer-cont"><div id="timerBar"></div></div>
+        <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸</button>
+    </div>
+    <div class="question-label" id="questionLabel">SORU</div>
+    <div class="word-display" id="qWord">...</div>
+    <div class="answer-label" id="answerLabel">▼ DOĞRU CEVABI SEÇ ▼</div>
+    <div id="optBox"></div>
+    <button id="manualNext" onclick="next()">⚠️ SÜRE BİTTİ! DEVAM ET</button>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3>✏️ Kelimeyi Düzenle</h3>
+        <input id="editEn" placeholder="İngilizce">
+        <input id="editTr" placeholder="Türkçe">
+        <div class="modal-btns">
+            <button class="btn" onclick="closeEdit()">İptal</button>
+            <button class="btn btn-main" onclick="saveEdit()">Kaydet</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const BUILTIN_DB = []; // words.json'dan yüklenecek
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function cleanDb(arr) {
+    return (arr||[]).map((w,i) => {
+        if(!w) return null;
+        let en = w.en||'', tr = w.tr||'';
+        if(en.includes('=')) { const i2=en.indexOf('='); tr=en.substring(i2+1).trim()||tr; en=en.substring(0,i2).trim(); }
+        if(tr.includes('=')) { const i2=tr.indexOf('='); tr=tr.substring(i2+1).trim(); }
+        // day alanı varsa koru, yoksa pozisyondan hesapla
+        const day = w.day || Math.ceil((i+1)/30);
+        return (en&&tr)?{en,tr,day}:null;
+    }).filter(x=>x);
+}
+// db'deki kelimelere day alanı yoksa ekle
+function ensureDays(arr) {
+    return arr.map((w,i) => w.day ? w : {...w, day: Math.ceil((i+1)/30)});
+}
+function parseLines(val) {
+    return val.split('\n').map(l => {
+        l=l.trim(); if(!l) return null;
+        let en,tr;
+        if(l.includes('='))      { const i=l.indexOf('='); en=l.substring(0,i).trim(); tr=l.substring(i+1).trim(); }
+        else if(l.includes(':')) { const i=l.indexOf(':'); en=l.substring(0,i).trim(); tr=l.substring(i+1).trim(); }
+        else { const i=l.indexOf(' '); if(i===-1) return null; en=l.substring(0,i).trim(); tr=l.substring(i+1).trim(); }
+        return (en&&tr)?{en,tr}:null;
+    }).filter(x=>x);
+}
+function getLenGroup(s) {
+    if(s.length<=8) return 'short';
+    if(s.length<=20) return 'medium';
+    return 'long';
+}
+function save() {
+    localStorage.setItem('v18_db',    JSON.stringify(db));
+    localStorage.setItem('v18_done',  JSON.stringify(done));
+    localStorage.setItem('v18_fails', JSON.stringify(fails));
+    localStorage.setItem('v18_stats', JSON.stringify(stats));
+    // Firestore'a da kaydet
+    if (window._saveToFirestore) window._saveToFirestore();
+}
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let db    = ensureDays(cleanDb(JSON.parse(localStorage.getItem('v18_db')    ||'[]')));
+let done  = JSON.parse(localStorage.getItem('v18_done')  ||'[]');
+let fails = cleanDb(JSON.parse(localStorage.getItem('v18_fails') ||'[]'));
+let stats = JSON.parse(localStorage.getItem('v18_stats') ||'{"correct":0,"wrong":0,"bestStreak":0}');
+// İlk açılışta BUILTIN_DB'yi yükle
+if(!db.length) { db = cleanDb(BUILTIN_DB); }
+save(); // temiz veriyi kaydet
+
+let appMode='learn', difficulty='easy', cur=[], idx=0, selectedDay='';
+let timer=null, timeLeft=90, errors=0, isPaused=false;
+let streak=0, soundOn=true, editIdx=null;
+
+const DIFF_TIME = { easy:90, mid:50, hard:25, lightning:5 };
+
+// ─── THEME ──────────────────────────────────────────────────────────────────
+(function(){
+    const t = localStorage.getItem('theme');
+    if(t==='light') { document.body.classList.add('light'); document.getElementById('themeBtn').innerText='☀️'; }
+})();
+function toggleTheme() {
+    document.body.classList.toggle('light');
+    const isLight = document.body.classList.contains('light');
+    localStorage.setItem('theme', isLight?'light':'dark');
+    document.getElementById('themeBtn').innerText = isLight?'☀️':'🌙';
+}
+function toggleSound() {
+    soundOn=!soundOn;
+    document.getElementById('soundBtn').innerText = soundOn?'🔊':'🔇';
+    if(!soundOn) window.speechSynthesis.cancel();
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function showTab(tab) {
+    ['play','stats','words','data','duel'].forEach(t => {
+        document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
+    });
+    document.querySelectorAll('.nav-tab').forEach((b,i) => {
+        b.classList.toggle('active', ['play','stats','words','data','duel'][i]===tab);
+    });
+    if(tab==='stats')  renderStats();
+    if(tab==='words')  renderWordList();
+    if(tab==='duel')   showDuelMode('online');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+    const p=document.getElementById('dayPicker'); p.innerHTML='';
+    if(!db.length) { p.innerHTML='<option>ÖNCE VERİ YÜKLEYİN</option>'; }
+    else {
+        const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+        for(let i=1;i<=totalDays;i++) {
+            const o=document.createElement('option'); o.value=i;
+            o.innerText=(done.includes(i.toString())?"✓ ":"")+"GÜN "+i;
+            p.appendChild(o);
+        }
+    }
+    if(fails.length>0) {
+        document.getElementById('failBtn').style.display='block';
+        document.getElementById('failBtn').innerText="❌ HATALAR ("+fails.length+")";
+    }
+}
+
+// ─── MODE / DIFFICULTY ───────────────────────────────────────────────────────
+function setMode(m) {
+    appMode=m;
+    ['learn','exam','zen'].forEach(x=>document.getElementById('m_'+x).classList.remove('active'));
+    document.getElementById('m_'+m).classList.add('active');
+    document.getElementById('dayPicker').style.display=(m==='zen')?'none':'block';
+    document.getElementById('startBtn').innerText=(m==='zen')?'▶ KARMA MODU BAŞLAT':'▶ DERSİ BAŞLAT';
+}
+function setDiff(d) {
+    difficulty=d;
+    document.querySelectorAll('.d-btn').forEach(b=>b.classList.toggle('active',b.dataset.d===d));
+}
+
+// ─── START ────────────────────────────────────────────────────────────────────
+function start(m) {
+    if(!db.length&&m!=='fails') return alert("Veri yok!");
+    idx=0; errors=0; streak=0; isPaused=false;
+    document.getElementById('homeBtn').style.display='block';
+    document.getElementById('menuScreen').classList.remove('active');
+    document.getElementById('gameScreen').classList.add('active');
+
+    if(appMode==='zen') {
+        cur=db.sort(()=>Math.random()-0.5).slice(0,100).map(w=>({word:w,isEn:Math.random()>0.5}));
+    } else if(m==='day') {
+        selectedDay=document.getElementById('dayPicker').value;
+        let raw=db.filter(w=>(w.day||1)==parseInt(selectedDay));
+        cur=[...raw.map(w=>({word:w,isEn:true})),...raw.map(w=>({word:w,isEn:false}))].sort(()=>Math.random()-0.5);
+    } else {
+        let pool=(m==='smart')?[]:db;
+        if(m==='smart') done.forEach(d=>pool.push(...db.filter(w=>(w.day||1)===parseInt(d))));
+        if(m==='fails') pool=fails;
+        cur=pool.sort(()=>Math.random()-0.5).slice(0,30).map(w=>({word:w,isEn:Math.random()>0.5}));
+    }
+    render();
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+    clearInterval(timer);
+    document.getElementById('manualNext').style.display='none';
+    const box=document.getElementById('optBox');
+    box.innerHTML=''; box.style.opacity='1'; box.style.pointerEvents='auto';
+
+    const task=cur[idx], w=task.word;
+    const q=task.isEn?w.en:w.tr;
+    const a=task.isEn?w.tr:w.en;
+
+    document.getElementById('questionLabel').innerText=task.isEn?'🔤 İNGİLİZCE':'🇹🇷 TÜRKÇE';
+    document.getElementById('answerLabel').innerText=task.isEn?'▼ TÜRKÇE KARŞILIĞI ▼':'▼ İNGİLİZCE KARŞILIĞI ▼';
+    document.getElementById('qWord').innerText=q;
+    document.getElementById('prog').innerText=(appMode==='zen'?"∞ ":"")+(idx+1)+"/"+cur.length;
+    document.getElementById('errCounter').innerText=(appMode==='zen')?"":"HATA: "+errors;
+
+    // Streak badge
+    const sb=document.getElementById('streakBadge');
+    if(streak>=3) { sb.style.display='block'; sb.innerText='🔥 '+streak; }
+    else sb.style.display='none';
+
+    // TTS - sadece İngilizce sorularda oku
+    if(soundOn && task.isEn) {
+        window.speechSynthesis.cancel();
+        function speakEn(text) {
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-US';
+            u.rate = 0.9;
+            u.pitch = 1.0;
+            u.volume = 1.0;
+            const voices = window.speechSynthesis.getVoices();
+            const preferred = ['Google US English','Microsoft Aria Online','Samantha','Karen','Daniel','Alex'];
+            const best = voices.find(v => preferred.some(p => v.name.includes(p)) && v.lang.startsWith('en'))
+                      || voices.find(v => v.lang.startsWith('en-US'))
+                      || voices.find(v => v.lang.startsWith('en'));
+            if(best) u.voice = best;
+            window.speechSynthesis.speak(u);
+        }
+        // getVoices() ilk açılışta boş olabilir, onvoiceschanged'i bekle
+        const voices = window.speechSynthesis.getVoices();
+        if(voices.length > 0) {
+            speakEn(w.en);
+        } else {
+            window.speechSynthesis.onvoiceschanged = () => { speakEn(w.en); };
+        }
+    }
+
+    // Timer (sadece exam modunda zorluk süresine göre)
+    if(appMode==='exam') {
+        document.getElementById('tRow').style.display='flex';
+        timeLeft=DIFF_TIME[difficulty]*10; // *10 çünkü 100ms interval
+        const maxTime=timeLeft;
+        const bar=document.getElementById('timerBar');
+        // Şimşek modunda bar rengi turuncu-kırmızı
+        bar.style.background = (difficulty==='lightning') ? '#f5a623' : 'var(--accent)';
+        if(difficulty==='lightning') document.getElementById('gameScreen').classList.add('lightning-mode'); else document.getElementById('gameScreen').classList.remove('lightning-mode');
+        timer=setInterval(()=>{ if(!isPaused){ timeLeft--; 
+            const pct=timeLeft/maxTime*100;
+            bar.style.width=pct+"%";
+            // Son %30'da renk kırmızıya kayar
+            if(pct<30) bar.style.background=(difficulty==='lightning')?'#f53d23':'#da3633';
+            if(timeLeft<=0){clearInterval(timer);handleTimeout();} 
+        } },100);
+    } else { document.getElementById('tRow').style.display='none'; }
+
+    // Şıklar: aynı uzunluk grubundan
+    let opts=[a];
+    const aGroup=getLenGroup(a);
+    let candidates=db.map(r=>task.isEn?r.tr:r.en)
+        .filter(p=>p&&p!==q&&p!==a&&getLenGroup(p)===aGroup)
+        .sort(()=>Math.random()-0.5);
+    for(let c of candidates){ if(opts.length>=4)break; if(!opts.includes(c))opts.push(c); }
+    if(opts.length<4) {
+        let fb=db.map(r=>task.isEn?r.tr:r.en).filter(p=>p&&p!==q&&!opts.includes(p)).sort(()=>Math.random()-0.5);
+        for(let c of fb){ if(opts.length>=4)break; opts.push(c); }
+    }
+    opts.sort(()=>Math.random()-0.5).forEach(o=>{
+        const btn=document.createElement('button'); btn.className='opt'; btn.innerText=o;
+        btn.onclick=()=>{
+            if(isPaused)return; clearInterval(timer);
+            if(o===a) {
+                btn.classList.add('correct');
+                streak++; stats.correct++;
+                if(streak>stats.bestStreak) stats.bestStreak=streak;
+                if(streak%10===0) showMot("🌟");
+                else if(streak%5===0) showMot("🔥");
+                save();
+                setTimeout(next,300);
+            } else {
+                btn.classList.add('wrong');
+                streak=0; stats.wrong++;
+                if(appMode!=='zen') errors++;
+                // Doğru cevabı göster
+                Array.from(box.children).forEach(b=>{ if(b.innerText===a) b.classList.add('reveal'); });
+                if(!fails.find(f=>f.en===w.en)){ fails.push(w); }
+                save();
+                setTimeout(next,900);
+            }
+        };
+        box.appendChild(btn);
+    });
+}
+
+function handleTimeout() {
+    errors++; streak=0; stats.wrong++; save();
+    document.getElementById('errCounter').innerText="HATA: "+errors;
+    document.getElementById('optBox').style.pointerEvents='none';
+    document.getElementById('optBox').style.opacity='0.3';
+    document.getElementById('manualNext').style.display='block';
+    // Doğru cevabı göster
+    const task=cur[idx],w=task.word;
+    const a=task.isEn?w.tr:w.en;
+    Array.from(document.getElementById('optBox').children).forEach(b=>{ if(b.innerText===a){b.style.opacity='1';b.classList.add('reveal');} });
+}
+
+function next(){ idx++; if(idx<cur.length)render(); else finish(); }
+
+function finish() {
+    if(appMode==='exam'&&errors>0) alert("Bitti! "+errors+" hata. Sınav geçilemedi 😔");
+    else if(appMode==='zen') alert("Zen seansı bitti. Harikaydın! 🧘");
+    else {
+        if(selectedDay&&!done.includes(selectedDay.toString())){ done.push(selectedDay.toString()); save(); }
+        alert("TEBRİKLER! Bölüm tamamlandı 🎉");
+    }
+    goHome();
+}
+
+function goHome() {
+    clearInterval(timer);
+    document.getElementById('homeBtn').style.display='none';
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('gameScreen').classList.remove('lightning-mode');
+    document.getElementById('menuScreen').classList.add('active');
+    init();
+}
+
+// ─── MISC ─────────────────────────────────────────────────────────────────────
+function showMot(txt){ const m=document.getElementById('mot'); m.innerText=txt; m.classList.add('show-mot'); setTimeout(()=>m.classList.remove('show-mot'),1000); }
+function togglePause(){ isPaused=!isPaused; document.getElementById('pauseBtn').innerText=isPaused?"▶":"⏸"; }
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function renderStats() {
+    document.getElementById('st-total').innerText=db.length;
+    document.getElementById('st-done').innerText=done.length;
+    document.getElementById('st-fails').innerText=fails.length;
+    const total=stats.correct+stats.wrong;
+    document.getElementById('st-acc').innerText=total?Math.round(stats.correct/total*100)+'%':'-%';
+    document.getElementById('st-streak').innerText=stats.bestStreak;
+
+    // Gün barları
+    const barBox=document.getElementById('st-days-bar');
+    barBox.innerHTML='';
+    const totalDays=db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+    for(let i=1;i<=Math.min(totalDays,10);i++) {
+        const isDone=done.includes(i.toString());
+        barBox.innerHTML+=`<div class="bar-wrap">
+            <div class="bar-label"><span>GÜN ${i}</span><span>${isDone?'✓':'—'}</span></div>
+            <div class="bar-bg"><div class="bar-fill" style="width:${isDone?100:0}%;background:${isDone?'var(--success)':'var(--border)'}"></div></div>
+        </div>`;
+    }
+}
+function clearFails() {
+    if(!confirm("Hatalı kelimeler temizlensin mi?")) return;
+    fails=[];
+    save();
+    renderStats();
+    const btn = document.getElementById('failBtn');
+    if(btn) btn.style.display = 'none';
+    alert("Hatalı kelimeler temizlendi!");
+}
+function resetStats() {
+    if(!confirm("İstatistikler sıfırlansın mı?")) return;
+    stats={correct:0,wrong:0,bestStreak:0}; save(); renderStats();
+}
+
+// ─── WORD LIST ────────────────────────────────────────────────────────────────
+function buildDayFilter() {
+    const sel = document.getElementById('dayFilter');
+    if(!sel) return;
+    // mevcut seçimi koru
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">📅 Tüm günler</option>';
+    const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+    for(let i = 1; i <= totalDays; i++) {
+        const o = document.createElement('option');
+        o.value = i;
+        const cnt = db.filter(w=>(w.day||1)===i).length;
+        o.innerText = (done.includes(i.toString()) ? "✓ " : "") + "GÜN " + i + " (" + cnt + " kelime)";
+        sel.appendChild(o);
+    }
+    if(cur) sel.value = cur;
+}
+function renderWordList() {
+    const dayVal = document.getElementById('dayFilter').value;
+    buildDayFilter();
+    if(dayVal) document.getElementById('dayFilter').value = dayVal;
+    const q = (document.getElementById('wordSearch').value || '').toLowerCase();
+    let pool = db;
+    if(dayVal) {
+        const d = parseInt(dayVal);
+        pool = db.filter(w=>(w.day||1)===d);
+    }
+    const filtered = pool.filter(w => w.en.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q));
+    document.getElementById('wordCount').innerText = filtered.length + " / " + db.length + " kelime";
+    const box = document.getElementById('wordListBox');
+    box.innerHTML = '';
+    if(!filtered.length) { box.innerHTML = '<div style="padding:20px;text-align:center;color:var(--subtext)">Kelime bulunamadı</div>'; return; }
+    filtered.forEach(w => {
+        const realIdx = db.indexOf(w);
+        const div = document.createElement('div'); div.className = 'word-list-item';
+        div.innerHTML = `<div><div class="wl-en">${w.en}</div><div class="wl-tr">${w.tr}</div></div>
+            <div>
+                <button class="wl-edit" onclick="openEdit(${realIdx})">✏️</button>
+                <button class="wl-del" onclick="deleteWord(${realIdx})">🗑️</button>
+            </div>`;
+        box.appendChild(div);
+    });
+}
+function deleteWord(i) {
+    if(!confirm('"'+db[i].en+'" silinsin mi?')) return;
+    db.splice(i,1); save(); renderWordList(); init();
+}
+function openEdit(i) {
+    editIdx=i;
+    document.getElementById('editEn').value=db[i].en;
+    document.getElementById('editTr').value=db[i].tr;
+    document.getElementById('editModal').classList.add('open');
+}
+function closeEdit() { document.getElementById('editModal').classList.remove('open'); editIdx=null; }
+function saveEdit() {
+    const en=document.getElementById('editEn').value.trim();
+    const tr=document.getElementById('editTr').value.trim();
+    if(!en||!tr) return alert("Boş bırakma!");
+    db[editIdx]={en,tr,day:db[editIdx].day}; save(); closeEdit(); renderWordList();
+}
+
+// ─── DATA ──────────────────────────────────────────────────────────────────────
+function saveRaw() {
+    const val=document.getElementById('rawBox').value.trim();
+    const newWords=parseLines(val);
+    if(!newWords.length) return alert("Geçerli kelime bulunamadı!");
+    const lastDay = db.length ? Math.max(...db.map(w=>w.day||1)) : 1;
+    newWords.forEach(nw=>{ const ei=db.findIndex(w=>w.en===nw.en); if(ei>=0)db[ei]={...nw,day:db[ei].day}; else db.push({...nw,day:lastDay}); });
+    save(); alert("Eklendi: "+newWords.length+" kelime\nToplam: "+db.length+" kelime");
+    document.getElementById('rawBox').value=''; init();
+}
+function getBackup() {
+    const btn=document.getElementById('bkBtn');
+    btn.innerText="İŞLENİYOR...";
+    setTimeout(()=>{
+        const payload = JSON.stringify({db,done,fails,stats});
+        document.getElementById('rawBox').value = payload;
+        btn.innerText="💾 YEDEK HAZIR";
+        // HTML dosyası olarak indir
+        const today = new Date().toISOString().slice(0,10);
+        const curHtml = document.documentElement.outerHTML;
+        const inject = "<scr"+"ipt>(function(){try{const d="+payload+";if(d.db&&d.db.length){localStorage.setItem('v18_db',JSON.stringify(d.db));localStorage.setItem('v18_done',JSON.stringify(d.done||[]));localStorage.setItem('v18_fails',JSON.stringify(d.fails||[]));localStorage.setItem('v18_stats',JSON.stringify(d.stats||{}));}}catch(e){}})();<\/scr"+"ipt>";
+        const finalHtml = curHtml.replace('</div></body>', inject + '</body>');
+        const blob = new Blob([finalHtml], {type:'text/html'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'alan12_yedek_' + today + '.html';
+        a.click();
+    }, 200);
+}
+function restoreBackup() {
+    try {
+        const d=JSON.parse(document.getElementById('rawBox').value.trim());
+        db=cleanDb(d.db||[]); done=d.done||[]; fails=cleanDb(d.fails||[]); stats=d.stats||{correct:0,wrong:0,bestStreak:0};
+        save(); alert("Yedek geri yüklendi!"); location.reload();
+    } catch(e){ alert("Geçersiz kod!"); }
+}
+function clearAll() {
+    if(!confirm("Tüm kelimeler, ilerleme ve istatistikler silinecek!\nEmin misin?")) return;
+    ['v18_db','v18_done','v18_fails','v18_stats'].forEach(k=>localStorage.removeItem(k));
+    alert("Tüm veri silindi."); location.reload();
+}
+
+// ─── DÜELLO ───────────────────────────────────────────────────────────────────
+let duelQuestions=[], duelQCount=10, duelCurPlayer=0;
+let duelScores=[{correct:0,wrong:0,time:0},{correct:0,wrong:0,time:0}];
+let duelIdx=0, duelTimer=null, duelTimeLeft=0, duelStartTime=0;
+const DUEL_TIME = 5; // saniye başına (şimşek modu!)
+
+function initDuel() {
+    // Yerel düello gün seçiciyi doldur
+    const sel = document.getElementById('duelDay');
+    if(sel) {
+        sel.innerHTML = '';
+        const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+        for(let i=1;i<=totalDays;i++) {
+            const o = document.createElement('option');
+            const cnt = db.filter(w=>(w.day||1)===i).length;
+            o.value=i; o.innerText='GÜN '+i+' ('+cnt+' kelime)';
+            sel.appendChild(o);
+        }
+    }
+    document.getElementById('duelSetup').style.display='block';
+    document.getElementById('duelTurn').style.display='none';
+    document.getElementById('duelGame').style.display='none';
+    document.getElementById('duelResult').style.display='none';
+    document.getElementById('onlineDuelSetup').style.display='none';
+    document.getElementById('onlineWaiting').style.display='none';
+    document.getElementById('onlineGame').style.display='none';
+    document.getElementById('onlineResult').style.display='none';
+}
+
+function setDuelQ(n) {
+    duelQCount = n;
+    document.querySelectorAll('[data-dq]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.dq)===n));
+}
+
+function startDuel() {
+    const day = parseInt(document.getElementById('duelDay').value);
+    const pool = db.filter(w=>(w.day||1)===day);
+    if(!pool.length) return alert('Bu günde kelime yok!');
+    // Her oyuncu için aynı sorular (karıştırılmış ama seed'li - shuffle once)
+    const shuffled = pool.slice().sort(()=>Math.random()-.5).slice(0, Math.min(duelQCount, pool.length));
+    duelQuestions = shuffled.map(w => ({word:w, isEn: Math.random()>.5}));
+    duelScores = [{correct:0,wrong:0,time:0},{correct:0,wrong:0,time:0}];
+    duelCurPlayer = 0;
+    duelIdx = 0;
+    showDuelTurn();
+}
+
+function showDuelTurn() {
+    const names = [document.getElementById('p1name').value||'Oyuncu 1',
+                   document.getElementById('p2name').value||'Oyuncu 2'];
+    document.getElementById('duelSetup').style.display='none';
+    document.getElementById('duelTurn').style.display='block';
+    document.getElementById('duelGame').style.display='none';
+    document.getElementById('duelResult').style.display='none';
+    document.getElementById('duelTurnName').innerText = names[duelCurPlayer] + ' — Hazır mısın?';
+}
+
+function beginPlayerTurn() {
+    duelIdx = 0;
+    document.getElementById('duelTurn').style.display='none';
+    document.getElementById('duelGame').style.display='block';
+    renderDuel();
+}
+
+function renderDuel() {
+    clearInterval(duelTimer);
+    const names = [document.getElementById('p1name').value||'Oyuncu 1',
+                   document.getElementById('p2name').value||'Oyuncu 2'];
+    const task = duelQuestions[duelIdx];
+    const w = task.word;
+    const q = task.isEn ? w.en : w.tr;
+    const a = task.isEn ? w.tr : w.en;
+
+    document.getElementById('duelPlayerLabel').innerText = '👤 ' + names[duelCurPlayer];
+    document.getElementById('duelProg').innerText = (duelIdx+1)+'/'+duelQuestions.length;
+    document.getElementById('duelQLabel').innerText = task.isEn ? '🔤 İNGİLİZCE' : '🇹🇷 TÜRKÇE';
+    document.getElementById('duelALabel').innerText = task.isEn ? '▼ TÜRKÇE KARŞILIĞI ▼' : '▼ İNGİLİZCE KARŞILIĞI ▼';
+    document.getElementById('duelWord').innerText = q;
+
+    // TTS
+    if(soundOn && task.isEn) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(w.en);
+        u.lang='en-US'; u.rate=0.9;
+        const voices = window.speechSynthesis.getVoices();
+        const best = voices.find(v=>['Google US English','Microsoft Aria Online','Samantha'].some(p=>v.name.includes(p))&&v.lang.startsWith('en'))
+                  || voices.find(v=>v.lang.startsWith('en-US'));
+        if(best) u.voice=best;
+        window.speechSynthesis.speak(u);
+    }
+
+    // Şıklar
+    let opts = [a];
+    const aGrp = getLenGroup(a);
+    let cands = db.map(r=>task.isEn?r.tr:r.en)
+        .filter(p=>p&&p!==q&&p!==a&&getLenGroup(p)===aGrp)
+        .sort(()=>Math.random()-.5);
+    for(const c of cands){if(opts.length>=4)break;if(!opts.includes(c))opts.push(c);}
+    if(opts.length<4){
+        const fb=db.map(r=>task.isEn?r.tr:r.en).filter(p=>p&&p!==q&&!opts.includes(p)).sort(()=>Math.random()-.5);
+        for(const c of fb){if(opts.length>=4)break;opts.push(c);}
+    }
+    opts.sort(()=>Math.random()-.5);
+    const box = document.getElementById('duelOpts');
+    box.innerHTML='';
+    box.style.pointerEvents='auto'; box.style.opacity='1';
+    opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.className='opt'; btn.innerText=o;
+        btn.onclick = () => {
+            clearInterval(duelTimer);
+            const elapsed = (Date.now() - duelStartTime) / 1000;
+            box.style.pointerEvents='none';
+            if(o===a) {
+                btn.classList.add('correct');
+                duelScores[duelCurPlayer].correct++;
+                duelScores[duelCurPlayer].time += elapsed;
+            } else {
+                btn.classList.add('wrong');
+                duelScores[duelCurPlayer].wrong++;
+                duelScores[duelCurPlayer].time += DUEL_TIME * 2; // ceza: 2x süre
+                Array.from(box.children).forEach(b=>{if(b.innerText===a)b.classList.add('reveal');});
+            }
+            setTimeout(nextDuel, 700);
+        };
+        box.appendChild(btn);
+    });
+
+    // Timer
+    duelTimeLeft = DUEL_TIME * 10;
+    duelStartTime = Date.now();
+    const maxTime = duelTimeLeft;
+    const bar = document.getElementById('duelTimerBar');
+    bar.style.width='100%'; bar.style.background='#f5a623'; // şimşek rengi
+    document.getElementById('duelTimer').innerText = DUEL_TIME+'s';
+    duelTimer = setInterval(()=>{
+        duelTimeLeft--;
+        const pct = duelTimeLeft/maxTime*100;
+        bar.style.width = pct+'%';
+        const secs = Math.ceil(duelTimeLeft/10);
+        document.getElementById('duelTimer').innerText = secs+'s';
+        if(pct < 30) bar.style.background='#da3633';
+        if(duelTimeLeft<=0) {
+            clearInterval(duelTimer);
+            duelScores[duelCurPlayer].wrong++;
+            duelScores[duelCurPlayer].time += DUEL_TIME;
+            box.style.pointerEvents='none'; box.style.opacity='0.4';
+            Array.from(box.children).forEach(b=>{if(b.innerText===a)b.classList.add('reveal');});
+            setTimeout(nextDuel, 800);
+        }
+    }, 100);
+}
+
+function nextDuel() {
+    duelIdx++;
+    if(duelIdx < duelQuestions.length) {
+        renderDuel();
+    } else {
+        // Bu oyuncu bitti
+        if(duelCurPlayer === 0) {
+            // 2. oyuncuya geç
+            duelCurPlayer = 1;
+            document.getElementById('duelGame').style.display='none';
+            showDuelTurn();
+        } else {
+            showDuelResult();
+        }
+    }
+}
+
+function showDuelResult() {
+    clearInterval(duelTimer);
+    window.speechSynthesis.cancel();
+    const names = [document.getElementById('p1name').value||'Oyuncu 1',
+                   document.getElementById('p2name').value||'Oyuncu 2'];
+    document.getElementById('duelGame').style.display='none';
+    document.getElementById('duelResult').style.display='block';
+
+    // Skor hesapla: doğruluk% × (1 / ortalama süre) × 1000
+    const calcScore = (s) => {
+        const total = s.correct + s.wrong;
+        if(!total) return 0;
+        const acc = s.correct / total;
+        const avgTime = s.time / total;
+        return Math.round(acc * (1 / Math.max(avgTime, 0.5)) * 1000);
+    };
+
+    const s0 = calcScore(duelScores[0]);
+    const s1 = calcScore(duelScores[1]);
+    const acc0 = duelScores[0].correct + duelScores[0].wrong > 0 ? Math.round(duelScores[0].correct/(duelScores[0].correct+duelScores[0].wrong)*100) : 0;
+    const acc1 = duelScores[1].correct + duelScores[1].wrong > 0 ? Math.round(duelScores[1].correct/(duelScores[1].correct+duelScores[1].wrong)*100) : 0;
+
+    let winnerIcon, winnerText;
+    if(s0 > s1) { winnerIcon='🏆'; winnerText = names[0]+' KAZANDI!'; }
+    else if(s1 > s0) { winnerIcon='🏆'; winnerText = names[1]+' KAZANDI!'; }
+    else { winnerIcon='🤝'; winnerText = 'BERABERE!'; }
+
+    document.getElementById('duelWinnerIcon').innerText = winnerIcon;
+    document.getElementById('duelWinnerText').innerText = winnerText;
+
+    const avgT0 = duelScores[0].time / Math.max(duelScores[0].correct+duelScores[0].wrong,1);
+    const avgT1 = duelScores[1].time / Math.max(duelScores[1].correct+duelScores[1].wrong,1);
+
+    document.getElementById('duelScoreBoard').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+            <div style="background:var(--card);border:2px solid ${s0>=s1?'var(--accent)':'var(--border)'};border-radius:12px;padding: clamp(12px,3.5vw,18px);text-align:center">
+                <div style="font-weight:bold;font-size:1rem;margin-bottom:8px">${names[0]}</div>
+                <div style="font-size:1.8rem;font-weight:bold;color:var(--accent)">${s0}</div>
+                <div style="font-size:0.75rem;color:var(--subtext);margin-top:4px">PUAN</div>
+                <div style="margin-top:8px;font-size:0.85rem;color:var(--subtext)">
+                    ✅ ${duelScores[0].correct} doğru<br>
+                    ❌ ${duelScores[0].wrong} yanlış<br>
+                    🎯 %${acc0} doğruluk<br>
+                    ⏱ ${avgT0.toFixed(1)}s ort.
+                </div>
+            </div>
+            <div style="background:var(--card);border:2px solid ${s1>=s0?'var(--accent)':'var(--border)'};border-radius:12px;padding: clamp(12px,3.5vw,18px);text-align:center">
+                <div style="font-weight:bold;font-size:1rem;margin-bottom:8px">${names[1]}</div>
+                <div style="font-size:1.8rem;font-weight:bold;color:var(--accent)">${s1}</div>
+                <div style="font-size:0.75rem;color:var(--subtext);margin-top:4px">PUAN</div>
+                <div style="margin-top:8px;font-size:0.85rem;color:var(--subtext)">
+                    ✅ ${duelScores[1].correct} doğru<br>
+                    ❌ ${duelScores[1].wrong} yanlış<br>
+                    🎯 %${acc1} doğruluk<br>
+                    ⏱ ${avgT1.toFixed(1)}s ort.
+                </div>
+            </div>
+        </div>`;
+}
+
+
+
+// ─── ONLINE DÜELLO ────────────────────────────────────────────────────────────
+let onlineDuelQCount = 10;
+let currentRoomCode = null;
+let myPlayerId = null;
+let myPlayerName = null;
+let isHost = false;
+let roomUnsubscribe = null;
+let ogTimer = null;
+let ogQuestions = [];
+let ogCurrentQ = 0;
+let ogAnswered = false;
+let ogTimeLeft = 0;
+const OG_TIME = 15; // saniye (varsayılan, zorluk seçimine göre değişir)
+
+function showDuelMode(mode) {
+    document.getElementById('onlineDuelSetup').style.display = mode==='online' ? 'block' : 'none';
+    document.getElementById('duelSetup').style.display = mode==='local' ? 'block' : 'none';
+    document.getElementById('onlineWaiting').style.display = 'none';
+    document.getElementById('onlineGame').style.display = 'none';
+    document.getElementById('onlineResult').style.display = 'none';
+    if(mode==='online') {
+        // Gün seçiciyi doldur
+        const sel = document.getElementById('onlineDuelDay');
+        sel.innerHTML = '';
+        const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+        for(let i=1;i<=totalDays;i++) {
+            const o = document.createElement('option');
+            const cnt = db.filter(w=>(w.day||1)===i).length;
+            o.value=i; o.innerText='GÜN '+i+' ('+cnt+' kelime)';
+            sel.appendChild(o);
+        }
+    }
+    if(mode==='local') initDuel();
+}
+
+function setOnlineDuelQ(n) {
+    onlineDuelQCount = n;
+    document.querySelectorAll('[data-odq]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.odq)===n));
+}
+
+function genRoomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({length:4}, ()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+async function createOnlineRoom() {
+    if(!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+        return alert('Önce Google ile giriş yapmalısın!');
+    }
+    const user = window.firebaseAuth.currentUser;
+    myPlayerId = user.uid;
+    myPlayerName = user.displayName || 'Oyuncu';
+    isHost = true;
+
+    const day = parseInt(document.getElementById('onlineDuelDay').value);
+
+let pool;
+if (duelPool === 'daily') {
+    pool = db.filter(w => (w.day||1) === day);
+    if(!pool.length) return alert('Bu günde kelime yok!');
+} else if (duelPool === 'learned') {
+    pool = db.filter(w => w.done && w.done.includes(day.toString()));
+    if(!pool.length) return alert('Öğrenilen kelime yok!');
+} else {
+    pool = db.slice();
+}
+
+const diffTimes = {easy:90, mid:50, hard:25, lightning:5};
+const selectedDiff = window.duelDiff || duelDiff || 'easy';
+const shuffled = pool.slice().sort(()=>Math.random()-.5).slice(0, Math.min(onlineDuelQCount, pool.length));
+const questions = shuffled.map(w => ({en:w.en, tr:w.tr, isEn:Math.random()>.5, time:diffTimes[selectedDiff]||90}));
+
+    const code = genRoomCode();
+    currentRoomCode = code;
+
+    const { doc, setDoc } = window.firestoreFunctions;
+    const roomRef = doc(window.firebaseDb, 'rooms', code);
+    await setDoc(roomRef, {
+        host: myPlayerId,
+        status: 'waiting',
+        questions: questions,
+        players: { [myPlayerId]: { name: myPlayerName, score: 0, answers: {} } },
+        createdAt: Date.now()
+    });
+
+    document.getElementById('onlineDuelSetup').style.display = 'none';
+    document.getElementById('onlineWaiting').style.display = 'block';
+    document.getElementById('roomCodeDisplay').innerText = code;
+    document.getElementById('startOnlineBtn').style.display = 'block';
+
+    listenRoom(code);
+}
+
+async function joinOnlineRoom() {
+    if(!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+        return alert('Önce Google ile giriş yapmalısın!');
+    }
+    const user = window.firebaseAuth.currentUser;
+    myPlayerId = user.uid;
+    myPlayerName = user.displayName || 'Oyuncu';
+    isHost = false;
+
+    const code = document.getElementById('joinRoomCode').value.trim().toUpperCase();
+    if(code.length !== 4) return alert('4 haneli kod gir!');
+
+    const { doc, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    const roomRef = doc(window.firebaseDb, 'rooms', code);
+    const snap = await getDoc(roomRef);
+
+    if(!snap.exists()) return alert('Oda bulunamadı!');
+    const data = snap.data();
+    if(data.status !== 'waiting') return alert('Oyun zaten başlamış!');
+    const playerCount = Object.keys(data.players||{}).length;
+    if(playerCount >= 5) return alert('Oda dolu! (Maks 5 oyuncu)');
+
+    currentRoomCode = code;
+    await updateDoc(roomRef, {
+        [`players.${myPlayerId}`]: { name: myPlayerName, score: 0, answers: {} }
+    });
+
+    document.getElementById('onlineDuelSetup').style.display = 'none';
+    document.getElementById('onlineWaiting').style.display = 'block';
+    document.getElementById('roomCodeDisplay').innerText = code;
+    document.getElementById('startOnlineBtn').style.display = 'none';
+
+    listenRoom(code);
+}
+
+function listenRoom(code) {
+    if(roomUnsubscribe) roomUnsubscribe();
+    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js").then(({doc, onSnapshot}) => {
+        const roomRef = doc(window.firebaseDb, 'rooms', code);
+        roomUnsubscribe = onSnapshot(roomRef, (snap) => {
+            if(!snap.exists()) return;
+            const data = snap.data();
+            const players = data.players || {};
+            const playerList = Object.entries(players);
+
+            // Bekleme odasındayken oyuncu listesini güncelle
+            if(data.status === 'waiting') {
+                const box = document.getElementById('waitingPlayers');
+                if(box) {
+                    box.innerHTML = playerList.map(([id, p]) =>
+                        `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:0.85rem">
+                            ${id===data.host?'👑 ':'👤 '}${p.name}
+                        </span>`
+                    ).join('');
+                }
+                const statusEl = document.getElementById('waitingStatus');
+                if(statusEl) statusEl.innerText = playerList.length + '/5 oyuncu bağlandı';
+            }
+
+            // Oyun başladıysa
+            if(data.status === 'playing' && document.getElementById('onlineGame').style.display === 'none') {
+                document.getElementById('onlineWaiting').style.display = 'none';
+                ogQuestions = data.questions;
+                ogCurrentQ = 0;
+                startOnlineGame(data);
+            }
+
+            // Oyun devam ediyorsa skor bandını güncelle
+            if(data.status === 'playing' && document.getElementById('onlineGame').style.display !== 'none') {
+                updateScoreBand(players);
+            }
+
+            // Oyun bittiyse
+            if(data.status === 'finished') {
+                clearInterval(ogTimer);
+                showOnlineResult(players, data);
+            }
+        });
+    });
+}
+// Düello havuz ve zorluk seçimi
+let duelPool = 'mixed';
+let duelDiff = 'easy';
+
+function setDuelPool(pool) {
+    duelPool = pool;
+    document.querySelectorAll('[data-pool]').forEach(b => 
+        b.classList.toggle('active', b.dataset.pool === pool));
+}
+
+function setDuelDiff(diff) {
+    window.duelDiff = diff;
+    document.querySelectorAll('[data-diff]').forEach(b => 
+        b.classList.toggle('active', b.dataset.diff === diff));
+}
+
+window.setDuelPool = setDuelPool;
+window.setDuelDiff = setDuelDiff;
+async function hostStartGame() {
+    if(!isHost) return;
+    const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    const roomRef = doc(window.firebaseDb, 'rooms', currentRoomCode);
+    await updateDoc(roomRef, { status: 'playing' });
+}
+
+function startOnlineGame(data) {
+    document.getElementById('onlineGame').style.display = 'block';
+    const players = data.players || {};
+    updateScoreBand(players);
+    renderOnlineQuestion();
+}
+
+function updateScoreBand(players) {
+    const band = document.getElementById('og-scoreBand');
+    if(!band) return;
+    const sorted = Object.entries(players).sort((a,b) => b[1].score - a[1].score);
+    band.innerHTML = sorted.map(([id, p]) =>
+        `<div style="flex:1;min-width:70px;background:var(--card);border:2px solid ${id===myPlayerId?'var(--accent)':'var(--border)'};border-radius:10px;padding:6px;text-align:center">
+            <div style="font-size:0.7rem;font-weight:bold;color:var(--subtext);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.name.split(' ')[0]}</div>
+            <div style="font-size:1.5rem;font-weight:bold;color:var(--accent)">${p.score||0}</div>
+        </div>`
+    ).join('');
+}
+
+function renderOnlineQuestion() {
+    clearInterval(ogTimer);
+    ogAnswered = false;
+
+    if(ogCurrentQ >= ogQuestions.length) {
+        endOnlineGame(); return;
+    }
+
+    const task = ogQuestions[ogCurrentQ];
+    const q = task.isEn ? task.en : task.tr;
+    const a = task.isEn ? task.tr : task.en;
+
+    document.getElementById('og-qLabel').innerText = task.isEn ? '🔤 İNGİLİZCE' : '🇹🇷 TÜRKÇE';
+    document.getElementById('og-word').innerText = q;
+    document.getElementById('og-prog').innerText = (ogCurrentQ+1)+'/'+ogQuestions.length;
+    document.getElementById('og-status').innerText = '';
+
+    // Şıklar
+    let opts = [a];
+    const aGrp = getLenGroup(a);
+    let cands = db.map(r=>task.isEn?r.tr:r.en)
+        .filter(p=>p&&p!==q&&p!==a&&getLenGroup(p)===aGrp)
+        .sort(()=>Math.random()-.5);
+    for(const c of cands){if(opts.length>=4)break;if(!opts.includes(c))opts.push(c);}
+    if(opts.length<4){
+        const fb=db.map(r=>task.isEn?r.tr:r.en).filter(p=>p&&p!==q&&!opts.includes(p)).sort(()=>Math.random()-.5);
+        for(const c of fb){if(opts.length>=4)break;opts.push(c);}
+    }
+    opts.sort(()=>Math.random()-.5);
+
+    const box = document.getElementById('og-opts');
+    box.innerHTML = '';
+    box.style.pointerEvents = 'auto';
+    opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.className = 'opt'; btn.innerText = o;
+        btn.onclick = () => answerOnline(o, a, btn, box);
+        box.appendChild(btn);
+    });
+
+    // Timer
+    const currentTime = ogQuestions[ogCurrentQ]?.time || OG_TIME;
+ogTimeLeft = currentTime * 10;
+    const bar = document.getElementById('og-timerBar');
+    const timerEl = document.getElementById('og-timer');
+    bar.style.width = '100%';
+    bar.style.background = 'var(--accent)';
+    timerEl.innerText = currentTime + 's';
+
+    ogTimer = setInterval(() => {
+        ogTimeLeft--;
+       const pct = ogTimeLeft / (currentTime*10) * 100;
+        bar.style.width = pct + '%';
+        timerEl.innerText = Math.ceil(ogTimeLeft/10) + 's';
+        if(pct < 30) bar.style.background = '#da3633';
+        if(ogTimeLeft <= 0) {
+            clearInterval(ogTimer);
+            box.style.pointerEvents = 'none';
+            Array.from(box.children).forEach(b => { if(b.innerText===a) b.classList.add('reveal'); });
+            document.getElementById('og-status').innerText = '⏰ Süre doldu!';
+            setTimeout(() => { ogCurrentQ++; renderOnlineQuestion(); }, 1200);
+        }
+    }, 100);
+}
+
+async function answerOnline(chosen, correct, btn, box) {
+    if(ogAnswered) return;
+    ogAnswered = true;
+    clearInterval(ogTimer);
+    box.style.pointerEvents = 'none';
+
+    const isCorrect = chosen === correct;
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+    if(!isCorrect) Array.from(box.children).forEach(b => { if(b.innerText===correct) b.classList.add('reveal'); });
+
+    document.getElementById('og-status').innerText = isCorrect ? '✅ Doğru!' : '❌ Yanlış!';
+
+    if(isCorrect) {
+        // Skoru Firestore'a yaz
+        const { doc, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+        try {
+            await updateDoc(doc(window.firebaseDb, 'rooms', currentRoomCode), {
+                [`players.${myPlayerId}.score`]: increment(1)
+            });
+        } catch(e) { console.warn(e); }
+    }
+
+    setTimeout(() => { ogCurrentQ++; renderOnlineQuestion(); }, 900);
+}
+
+async function endOnlineGame() {
+    if(!isHost) return;
+    try {
+        const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+        await updateDoc(doc(window.firebaseDb, 'rooms', currentRoomCode), { status: 'finished' });
+    } catch(e) { console.warn(e); }
+}
+
+function showOnlineResult(players, data) {
+    document.getElementById('onlineGame').style.display = 'none';
+    document.getElementById('onlineResult').style.display = 'block';
+
+    const sorted = Object.entries(players).sort((a,b) => b[1].score - a[1].score);
+    const winner = sorted[0];
+    const isWinner = winner[0] === myPlayerId;
+    const isTie = sorted.length > 1 && sorted[0][1].score === sorted[1][1].score;
+
+    document.getElementById('og-winnerIcon').innerText = isTie ? '🤝' : (isWinner ? '🏆' : '🥇');
+    document.getElementById('og-winnerText').innerText = isTie ? 'BERABERE!' : winner[1].name + ' KAZANDI!';
+
+    const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+    document.getElementById('og-scoreBoard').innerHTML = sorted.map(([id,p],i) =>
+        `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
+            background:var(--card);border:2px solid ${id===myPlayerId?'var(--accent)':'var(--border)'};
+            border-radius:10px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:1.4rem">${medals[i]}</span>
+                <span style="font-weight:bold">${p.name}</span>
+                ${id===myPlayerId?'<span style="font-size:0.75rem;background:var(--accent);color:white;padding:2px 6px;border-radius:10px">Sen</span>':''}
+            </div>
+            <span style="font-size:1.5rem;font-weight:bold;color:var(--accent)">${p.score||0}</span>
+        </div>`
+    ).join('');
+
+    if(roomUnsubscribe) { roomUnsubscribe(); roomUnsubscribe = null; }
+}
+
+async function cancelOnlineRoom() {
+    if(roomUnsubscribe) { roomUnsubscribe(); roomUnsubscribe = null; }
+    if(currentRoomCode && isHost) {
+        try {
+            const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            await deleteDoc(doc(window.firebaseDb, 'rooms', currentRoomCode));
+        } catch(e) {}
+    }
+    currentRoomCode = null;
+    showDuelMode('online');
+}
+
+// ─── PWA INSTALL ──────────────────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBtn').style.display = 'block';
+});
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installBtn').style.display = 'none';
+    deferredPrompt = null;
+});
+async function installApp() {
+    if(!deferredPrompt) {
+        alert('Kurulum için tarayıcı menüsünden "Ana Ekrana Ekle" seçeneğini kullan.');
+        return;
+    }
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+}
+
+// Service Worker kaydet
+if('serviceWorker' in navigator) {
+    const swCode = `
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => { clients.claim(); });
+self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
+    `;
+    const blob = new Blob([swCode], {type:'text/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+
+init();
+</script>
+  <script>
+  async function googleGiris() {
+    try {
+      const provider = new window.GoogleAuthProvider();
+      const result = await window.signInWithPopup(window.firebaseAuth, provider);
+      const user = result.user;
+      document.getElementById('user-name').textContent = user.displayName;
+      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'inline-block';
+    } catch (e) {
+      alert('Giriş hatası: ' + e.message);
+    }
+  }
+
+  async function googleCikis() {
+    await window.signOut(window.firebaseAuth);
+    document.getElementById('user-name').textContent = '';
+    document.getElementById('login-btn').style.display = 'inline-block';
+    document.getElementById('logout-btn').style.display = 'none';
+  }
+
+  window.googleGiris = googleGiris;
+  window.googleCikis = googleCikis;
+</script>
+  <script type="module">
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+  // Zaten başlatılmış app'i kullan
+  const app = getApps()[0];
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const SYNC_LOADED_KEY = 'syncLoadedAt';
+
+  async function loadFromFirestore(user) {
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        if (data.localStorage) {
+          const remoteTs = typeof data.updatedAt === 'number' ? data.updatedAt : parseInt(data.updatedAt || '0');
+          const localTs  = parseInt(localStorage.getItem('updatedAt') || '0');
+          if (remoteTs > localTs) {
+            Object.keys(data.localStorage).forEach(key => {
+              localStorage.setItem(key, data.localStorage[key]);
+            });
+            localStorage.setItem('updatedAt', String(remoteTs));
+            sessionStorage.setItem(SYNC_LOADED_KEY, '1');
+            location.reload();
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('Firestore yükleme hatası:', e);
+    }
+  }
+
+  // Global saveToFirestore — save() içinden çağrılıyor
+  window._saveToFirestore = async function() {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      const now = Date.now();
+      localStorage.setItem('updatedAt', String(now));
+      const localData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        localData[key] = localStorage.getItem(key);
+      }
+      await setDoc(doc(db, "users", user.uid), { localStorage: localData, updatedAt: now });
+    } catch(e) {
+      console.warn('Firestore kayıt hatası:', e);
+    }
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      document.getElementById('user-name').textContent = user.displayName;
+      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'inline-block';
+      if (!sessionStorage.getItem(SYNC_LOADED_KEY)) {
+        sessionStorage.setItem(SYNC_LOADED_KEY, '1');
+        await loadFromFirestore(user);
+      }
+    } else {
+      document.getElementById('user-name').textContent = '';
+      document.getElementById('login-btn').style.display = 'inline-block';
+      document.getElementById('logout-btn').style.display = 'none';
+    }
+  });
+
+  setInterval(() => window._saveToFirestore && window._saveToFirestore(), 60000);
+</script>
+</body>
+
+</html>
+
