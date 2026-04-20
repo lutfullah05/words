@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alan 12">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D47A1">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="worldsword2-icon.png">
+<link rel="icon" type="image/svg+xml" href="worldsword2-icon.png">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+window.firestoreFunctions = { doc, setDoc, getDoc };
+const firebaseConfig = {
+  apiKey: "AIzaSyCV8pCQQMUP58eTOwx_wDhokqjxz5-eAZU",
+  authDomain: "words-fc573.firebaseapp.com",
+  projectId: "words-fc573",
+  storageBucket: "words-fc573.firebasestorage.app",
+  messagingSenderId: "772235956572",
+  appId: "1:772235956572:web:11529bd4e198011ff8b199",
+  measurementId: "G-68ZZFRQK7F"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+window.firebaseAuth = auth;
+window.firebaseDb = db;
+window.GoogleAuthProvider = GoogleAuthProvider;
+window.signInWithPopup = signInWithPopup;
+window.signOut = signOut;
+window.onAuthStateChanged = onAuthStateChanged;
+</script>
+<title>ALAN 12 • TRUE ZEN v4</title>
+<style>
+* { -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; height: -webkit-fill-available; overflow: hidden; overscroll-behavior: none; }
+body { position: fixed; width: 100%; font-size: clamp(14px, 4vw, 18px); }
+.container { height: 100vh; height: 100dvh; height: -webkit-fill-available; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0 clamp(8px, 3vw, 20px); box-sizing: border-box; }
+.nav-tabs { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+.app-wrapper { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+:root { --bg:#0d1117; --card:#161b22; --border:#30363d; --accent:#58a6ff; --success:#238636; --error:#da3633; --warn:#d29922; --text:#c9d1d9; --subtext:#8b949e; }
+body.light { --bg:#f6f8fa; --card:#ffffff; --border:#d0d7de; --accent:#0969da; --success:#1a7f37; --error:#cf222e; --warn:#9a6700; --text:#24292f; --subtext:#57606a; }
+* { box-sizing: border-box; }
+body { background:var(--bg); color:var(--text); font-family:-apple-system,sans-serif; margin:0; overflow-x:hidden; transition: background 0.3s, color 0.3s; }
+.header { background:var(--card); width:100%; padding:12px 15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+.header-title { font-weight:bold; font-size:1rem; }
+.header-btns { display:flex; gap:8px; }
+.icon-btn { background:var(--border); border:none; color:var(--text); padding:5px 10px; border-radius:8px; cursor:pointer; font-size:1rem; }
+.container { width:95%; max-width:900px; padding: clamp(10px, 4vw, 20px); margin:0 auto; }
+@media (min-width: 700px) { .opt { font-size:1.1rem; padding:14px; } .word-display { font-size:2.8rem; } body { font-size: clamp(14px, 1.5vw, 18px); } }
+.nav-tabs { display:flex; gap:0; margin-bottom:15px; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.nav-tab { flex:1; padding: clamp(10px,3vw,14px); background:transparent; border:none; color:var(--subtext); font-weight:bold; font-size:0.85rem; cursor:pointer; transition:0.2s; }
+.nav-tab.active { background:var(--accent); color:white; }
+.screen { display:none; }
+.screen.active { display:block; }
+.mode-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:15px; }
+.m-btn { padding: clamp(10px,3vw,14px); border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; color:var(--subtext); background:var(--card); transition:0.3s; }
+.m-btn.active { background:var(--accent); color:white; border-color:var(--accent); }
+.diff-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:5px; margin-bottom:15px; }
+.d-btn { padding: clamp(8px,2.5vw,12px); border:1px solid var(--border); border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:bold; color:var(--subtext); background:var(--card); transition:0.3s; }
+.d-btn.active { color:white; border-color:currentColor; }
+.d-btn[data-d="easy"].active { background:#238636; }
+.d-btn[data-d="mid"].active { background:#d29922; color:#000; }
+.d-btn[data-d="hard"].active { background:#da3633; }
+.d-btn[data-d="lightning"].active { background:linear-gradient(135deg,#f5a623,#f53d23); color:#fff; }
+@keyframes lightning-flash { 0%,100% { background:var(--card); } 50% { background:rgba(245,166,35,0.15); } }
+.lightning-mode { animation: lightning-flash 0.5s infinite; }
+select { width:100%; padding: clamp(11px,3.5vw,16px); background:var(--card); color:var(--accent); border:2px solid var(--accent); border-radius:12px; margin-bottom:15px; font-size:1.1rem; font-weight:bold; outline:none; }
+.btn { background:var(--card); border:1px solid var(--border); color:var(--text); padding: clamp(11px,3.5vw,16px); border-radius:12px; cursor:pointer; font-weight:bold; width:100%; margin-bottom:8px; font-size:1rem; transition:0.2s; }
+.btn:hover { border-color:var(--accent); }
+.btn-main { background:var(--success); border:none; font-size:1.1rem; color:white; }
+.btn-accent { color:var(--accent); }
+.btn-error { color:var(--error); background:#3a1a1a; }
+.btn-warn { color:var(--warn); }
+.btn-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.game-top { display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; margin-bottom:5px; font-weight:bold; }
+.streak-badge { background:var(--warn); color:#000; padding:2px 8px; border-radius:20px; font-size:0.85rem; font-weight:bold; display:none; }
+.timer-row { display:flex; align-items:center; gap:10px; margin:8px 0; }
+.timer-cont { flex-grow:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+#timerBar { width:100%; height:100%; background:var(--accent); transition:width 0.1s linear; }
+.question-label { font-size:0.85rem; font-weight:bold; color:var(--subtext); text-transform:uppercase; letter-spacing:2px; margin-bottom:4px; text-align:center; }
+.word-display { font-size:2.2rem; font-weight:bold; margin:8px 0 4px 0; color:var(--text); min-height:50px; text-align:center; line-height:1.2; }
+.answer-label { font-size:0.85rem; font-weight:bold; color:var(--accent); text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; text-align:center; }
+.opt { background:var(--card); border:1px solid var(--border); color:var(--text); padding:16px; border-radius:15px; cursor:pointer; font-size:1.15rem; font-weight:bold; width:100%; margin-bottom:8px; transition:0.1s; text-align:center; }
+.opt:hover { border-color:var(--accent); }
+.correct { background:var(--success) !important; border-color:#3fb950 !important; color:white !important; }
+.wrong { background:var(--error) !important; border-color:#f85149 !important; color:white !important; }
+.reveal { background:#1f3a5f !important; border-color:var(--accent) !important; color:var(--accent) !important; }
+#manualNext { display:none; background:var(--warn); color:black; padding: clamp(11px,3.5vw,16px); border-radius:12px; font-weight:bold; width:100%; margin-top:8px; cursor:pointer; border:none; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding: clamp(10px, 4vw, 20px); margin-bottom:12px; }
+.stat-title { font-size:0.9rem; color:var(--subtext); margin-bottom:8px; font-weight:bold; text-transform:uppercase; }
+.stat-big { font-size:2.2rem; font-weight:bold; color:var(--accent); }
+.stat-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
+.stat-mini { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
+.stat-mini .val { font-size:1.5rem; font-weight:bold; }
+.stat-mini .lbl { font-size:0.75rem; color:var(--subtext); margin-top:2px; }
+.bar-wrap { margin-bottom:6px; }
+.bar-label { display:flex; justify-content:space-between; font-size:0.85rem; color:var(--subtext); margin-bottom:2px; }
+.bar-bg { background:var(--border); border-radius:4px; height:10px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; transition:width 0.6s; }
+.word-list-item { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--border); font-size:0.95rem; }
+.word-list-item:last-child { border-bottom:none; }
+.wl-en { font-weight:bold; color:var(--text); }
+.wl-tr { color:var(--subtext); font-size:0.9rem; margin-top:2px; }
+.wl-del { background:none; border:none; color:var(--error); cursor:pointer; font-size:1.1rem; padding:4px 8px; }
+.wl-edit { background:none; border:none; color:var(--accent); cursor:pointer; font-size:1rem; padding:4px 8px; }
+.search-box { width:100%; padding: clamp(10px,3vw,14px); background:var(--card); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; margin-bottom:10px; outline:none; }
+.wl-container { background:var(--card); border:1px solid var(--border); border-radius:12px; max-height:60vh; overflow-y:auto; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; justify-content:center; align-items:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; width:90%; max-width:600px; }
+.modal h3 { margin:0 0 15px 0; font-size:1.1rem; }
+.modal input { width:100%; padding: clamp(10px,3vw,14px); background:var(--bg); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:1rem; margin-bottom:10px; outline:none; }
+.modal-btns { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+textarea { width:100%; height:90px; background:var(--bg); color:var(--accent); border:1px solid var(--border); border-radius:8px; font-size:0.85rem; padding: clamp(8px,2.5vw,12px); font-family:monospace; resize:vertical; }
+#mot { position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); font-size:3.5rem; pointer-events:none; opacity:0; transition:0.5s; z-index:1000; }
+.show-mot { opacity:1 !important; transform:translate(-50%,-60%) scale(1.5) !important; }
+.pause-btn { background:var(--border); border:none; color:var(--text); padding:3px 9px; border-radius:7px; cursor:pointer; font-size:0.9rem; }
+#loadingScreen { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:16px; }
+#loadingScreen .spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#loadingScreen .load-text { color:var(--subtext); font-size:0.9rem; font-weight:bold; }
+</style>
+</head>
+<body>
+<div class="app-wrapper" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)">
+
+<!-- YÜKLENİYOR EKRANI -->
+<div id="loadingScreen">
+  <div class="spinner"></div>
+  <div class="load-text" id="loadText">Kelimeler yükleniyor...</div>
+</div>
+
+<div id="mot">🔥</div>
+
+<div class="header">
+  <div class="header-title" id="hT">ALAN 12 • TRUE ZEN v4</div>
+  <div class="header-btns" style="display:flex;align-items:center;gap:8px;">
+    <span id="user-name" style="font-size:0.85rem;color:var(--subtext);"></span>
+    <button id="login-btn" onclick="googleGiris()" style="background:#4285f4;color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:bold;">🔑 Giriş</button>
+    <button id="logout-btn" onclick="googleCikis()" style="display:none;background:#e53935;color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:bold;">Çıkış</button>
+    <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Ses">🔊</button>
+    <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Tema">🌙</button>
+    <button class="icon-btn" id="homeBtn" style="display:none;" onclick="goHome()">🏠</button>
+  </div>
+</div>
+
+<div class="container screen active" id="menuScreen">
+  <div id="installBtn" onclick="installApp()" style="display:none;width:100%;padding:clamp(10px,3vw,14px);background:linear-gradient(135deg,#58a6ff,#3fb950);color:white;border:none;border-radius:10px;font-size:0.95rem;font-weight:bold;cursor:pointer;margin-bottom:10px;text-align:center">
+    📲 Ana Ekrana Ekle (Uygulama Olarak Aç)
+  </div>
+  <div class="nav-tabs" style="display:flex;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+    <button class="nav-tab active" onclick="showTab('play')">🎮 OYNA</button>
+    <button class="nav-tab" onclick="showTab('stats')">📊 İSTATİSTİK</button>
+    <button class="nav-tab" onclick="showTab('words')">📚 KELİMELER</button>
+    <button class="nav-tab" onclick="showTab('data')">⚙️ VERİ</button>
+    <button class="nav-tab" onclick="showTab('duel')">⚔️ DÜELLO</button>
+  </div>
+
+  <div id="tab-play">
+    <div class="mode-row">
+      <button id="m_learn" class="m-btn active" onclick="setMode('learn')">🎓 ÖĞRETİCİ</button>
+      <button id="m_exam" class="m-btn" onclick="setMode('exam')">🏆 SINAV</button>
+      <button id="m_zen" class="m-btn" onclick="setMode('zen')">🧘 ZEN</button>
+    </div>
+    <div style="margin-bottom:8px;font-size:0.85rem;color:var(--subtext);font-weight:bold;text-transform:uppercase;letter-spacing:1px;">ZORLUK</div>
+    <div class="diff-row">
+      <button class="d-btn active" data-d="easy" onclick="setDiff('easy')">🟢 KOLAY<br><span style="font-size:0.7rem;font-weight:normal">90sn</span></button>
+      <button class="d-btn" data-d="mid" onclick="setDiff('mid')">🟡 ORTA<br><span style="font-size:0.7rem;font-weight:normal">50sn</span></button>
+      <button class="d-btn" data-d="hard" onclick="setDiff('hard')">🔴 ZOR<br><span style="font-size:0.7rem;font-weight:normal">25sn</span></button>
+      <button class="d-btn" data-d="lightning" onclick="setDiff('lightning')">⚡ ŞİMŞEK<br><span style="font-size:0.7rem;font-weight:normal">5sn</span></button>
+    </div>
+    <select id="dayPicker"></select>
+    <button class="btn btn-main" id="startBtn" onclick="start('day')">▶ DERSİ BAŞLAT</button>
+    <button class="btn btn-accent" onclick="start('smart')">🌀 AKILLI TEKRAR</button>
+    <button id="failBtn" class="btn" style="color:var(--error);display:none;" onclick="start('fails')"></button>
+  </div>
+
+  <div id="tab-stats" style="display:none;">
+    <div class="stat-row">
+      <div class="stat-mini"><div class="val" id="st-total" style="color:var(--accent)">0</div><div class="lbl">KELİME</div></div>
+      <div class="stat-mini"><div class="val" id="st-done" style="color:var(--success)">0</div><div class="lbl">TAMAMLANAN GÜN</div></div>
+      <div class="stat-mini"><div class="val" id="st-fails" style="color:var(--error)">0</div><div class="lbl">HATA</div></div>
+    </div>
+    <div class="stat-card"><div class="stat-title">📈 DOĞRULUK ORANI</div><div class="stat-big" id="st-acc">-%</div></div>
+    <div class="stat-card"><div class="stat-title">🔥 EN UZUN STREAK</div><div class="stat-big" id="st-streak">0</div></div>
+    <div class="stat-card"><div class="stat-title">📅 GÜN İLERLEMESİ</div><div id="st-days-bar"></div></div>
+    <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:80px;">
+      <button class="btn btn-error" style="flex:1" onclick="clearFails()">❌ HATALARI TEMİZLE</button>
+      <button class="btn btn-error" style="flex:1;opacity:0.7" onclick="resetStats()">🗑️ TÜMÜNÜ SIFIRLA</button>
+    </div>
+  </div>
+
+  <div id="tab-words" style="display:none;">
+    <input class="search-box" id="wordSearch" placeholder="🔍 Kelime ara..." oninput="renderWordList()">
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+      <select id="dayFilter" onchange="renderWordList()" style="flex:1;padding:clamp(8px,2.5vw,12px);background:var(--card);color:var(--accent);border:1px solid var(--border);border-radius:8px;font-size:0.9rem;font-weight:bold;outline:none;min-width:120px;margin-bottom:0;">
+        <option value="">📅 Tüm günler</option>
+      </select>
+      <div style="font-size:0.9rem;color:var(--subtext);font-weight:bold;white-space:nowrap;" id="wordCount"></div>
+    </div>
+    <div class="wl-container" id="wordListBox"></div>
+    <div id="wlLoadMore" style="display:none;text-align:center;padding:12px;">
+      <button class="btn" onclick="loadMoreWords()" style="width:auto;padding:8px 24px;">Daha fazla yükle</button>
+    </div>
+  </div>
+
+  <div id="tab-data" style="display:none;">
+    <textarea id="rawBox" placeholder="Kelime listesi (her satıra bir kelime):&#10;word=anlam&#10;low-carbohydrate=düşük karbonhidratlı"></textarea>
+    <div class="btn-grid2" style="margin-top:8px;">
+      <button class="btn" style="font-size:0.85rem;" onclick="saveRaw()">➕ KELİME EKLE</button>
+      <button id="bkBtn" class="btn btn-warn" style="font-size:0.85rem;" onclick="getBackup()">💾 YEDEK AL</button>
+      <button class="btn" style="font-size:0.85rem;grid-column:span 2;" onclick="restoreBackup()">📥 YEDEK GERİ YÜKLE</button>
+      <button class="btn btn-error" style="font-size:0.85rem;grid-column:span 2;" onclick="clearAll()">🗑️ TÜM VERİYİ SİL</button>
+    </div>
+  </div>
+
+  <div id="tab-duel" style="display:none;">
+    <div id="duelModeSelect" style="margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <button class="btn" onclick="showDuelMode('local')" style="background:var(--card);border:2px solid var(--accent);color:var(--accent);font-weight:bold">📱 Yerel Düello<br><span style="font-size:0.75rem;font-weight:normal;color:var(--subtext)">Aynı cihazda</span></button>
+        <button class="btn" onclick="showDuelMode('online')" style="background:var(--accent);border:2px solid var(--accent);color:white;font-weight:bold">🌐 Online Düello<br><span style="font-size:0.75rem;font-weight:normal;opacity:0.8">Farklı cihazlarda</span></button>
+      </div>
+    </div>
+    <div id="onlineDuelSetup">
+      <div style="font-size:1.1rem;font-weight:bold;margin-bottom:12px;text-align:center">🌐 ONLİNE DÜELLO</div>
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold;">KELİME HAVUZU</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="d-btn active" data-pool="mixed" onclick="setDuelPool('mixed')">🔀 Karışık</button>
+        <button class="d-btn" data-pool="learned" onclick="setDuelPool('learned')">✅ Öğrenilen</button>
+        <button class="d-btn" data-pool="daily" onclick="setDuelPool('daily')">📅 Güne Göre</button>
+      </div>
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold;">ZORLUK</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="d-btn active" data-diff="easy" onclick="setDuelDiff('easy')">🟢 Kolay</button>
+        <button class="d-btn" data-diff="mid" onclick="setDuelDiff('mid')">🟡 Orta</button>
+        <button class="d-btn" data-diff="hard" onclick="setDuelDiff('hard')">🔴 Zor</button>
+        <button class="d-btn" data-diff="lightning" onclick="setDuelDiff('lightning')">⚡ Şimşek</button>
+      </div>
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">GÜN SEÇ</div>
+      <select id="onlineDuelDay" style="width:100%;padding:12px;background:var(--card);color:var(--accent);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;font-size:1rem;font-weight:bold"></select>
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">SORU SAYISI</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button class="d-btn active" data-odq="10" onclick="setOnlineDuelQ(10)">10</button>
+        <button class="d-btn" data-odq="20" onclick="setOnlineDuelQ(20)">20</button>
+        <button class="d-btn" data-odq="30" onclick="setOnlineDuelQ(30)">30</button>
+      </div>
+      <button class="btn btn-main" onclick="createOnlineRoom()" style="margin-bottom:8px">🏠 Oda Oluştur</button>
+      <div style="text-align:center;color:var(--subtext);font-size:0.85rem;margin:8px 0">— veya —</div>
+      <input id="joinRoomCode" class="search-box" placeholder="Oda kodu gir (örn: AB3X)" style="text-transform:uppercase;margin-bottom:8px">
+      <button class="btn" onclick="joinOnlineRoom()" style="color:var(--accent);border-color:var(--accent)">🚪 Odaya Katıl</button>
+    </div>
+    <div id="onlineWaiting" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:3rem;margin-bottom:10px">⏳</div>
+      <div style="font-size:1.1rem;font-weight:bold;margin-bottom:8px">Oda Kodu:</div>
+      <div id="roomCodeDisplay" style="font-size:3rem;font-weight:bold;color:var(--accent);letter-spacing:8px;margin-bottom:12px"></div>
+      <div style="font-size:0.9rem;color:var(--subtext);margin-bottom:16px">Bu kodu arkadaşına gönder!</div>
+      <div id="waitingStatus" style="font-size:0.95rem;color:var(--warn)">Rakip bekleniyor...</div>
+      <div id="waitingPlayers" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
+      <button id="startOnlineBtn" class="btn btn-main" onclick="hostStartGame()" style="display:none;margin-top:12px">▶ Oyunu Başlat</button>
+      <div style="font-size:0.8rem;color:var(--subtext);margin-top:6px">Maksimum 5 oyuncu</div>
+      <button class="btn btn-error" onclick="cancelOnlineRoom()" style="margin-top:10px;width:auto;padding:8px 20px">İptal</button>
+    </div>
+    <div id="onlineGame" style="display:none;">
+      <div id="og-scoreBand" style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px"></div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px">
+        <div id="og-timerBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width .1s linear;width:100%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div id="og-prog" style="font-size:0.85rem;color:var(--subtext)"></div>
+        <div id="og-timer" style="font-size:1.1rem;font-weight:bold;color:var(--accent)"></div>
+      </div>
+      <div style="font-size:0.85rem;color:var(--subtext);font-weight:bold;margin-bottom:4px" id="og-qLabel">🔤 İNGİLİZCE</div>
+      <div id="og-word" style="font-size:clamp(1.3rem,5vw,2rem);font-weight:bold;margin:8px 0 14px;text-align:center;line-height:1.3"></div>
+      <div id="og-opts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+      <div id="og-status" style="text-align:center;margin-top:10px;font-size:0.9rem;color:var(--warn);min-height:24px"></div>
+    </div>
+    <div id="onlineResult" style="display:none;text-align:center;padding:10px 0">
+      <div id="og-winnerIcon" style="font-size:3rem;margin-bottom:8px"></div>
+      <div id="og-winnerText" style="font-size:1.3rem;font-weight:bold;color:var(--accent);margin-bottom:16px"></div>
+      <div id="og-scoreBoard" style="margin-bottom:16px"></div>
+      <button class="btn btn-main" onclick="showDuelMode('online')">🔄 Tekrar Oyna</button>
+    </div>
+    <div class="card" id="duelSetup" style="display:none;">
+      <div style="font-size:1.2rem;font-weight:bold;margin-bottom:12px;text-align:center">📱 YEREL DÜELLO</div>
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">OYUNCU 1 İSMİ</div>
+      <input id="p1name" class="search-box" placeholder="Oyuncu 1" style="margin-bottom:10px" value="Oyuncu 1">
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">OYUNCU 2 İSMİ</div>
+      <input id="p2name" class="search-box" placeholder="Oyuncu 2" style="margin-bottom:10px" value="Oyuncu 2">
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">GÜN SEÇ</div>
+      <select id="duelDay" style="width:100%;padding:clamp(10px,3vw,14px);background:var(--card);color:var(--accent);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;font-size:1rem;font-weight:bold"></select>
+      <div style="font-size:0.85rem;color:var(--subtext);margin-bottom:8px;font-weight:bold">SORU SAYISI</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button class="d-btn active" data-dq="10" onclick="setDuelQ(10)">10 soru</button>
+        <button class="d-btn" data-dq="20" onclick="setDuelQ(20)">20 soru</button>
+        <button class="d-btn" data-dq="30" onclick="setDuelQ(30)">30 soru</button>
+      </div>
+      <button class="btn" onclick="startDuel()" style="width:100%;padding:clamp(12px,3.5vw,18px);background:var(--accent);color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:bold;cursor:pointer">⚔️ DÜELLOYU BAŞLAT</button>
+    </div>
+    <div id="duelTurn" style="display:none;" class="card">
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:2.5rem;margin-bottom:10px">🎮</div>
+        <div id="duelTurnName" style="font-size:clamp(1.3rem,5vw,1.8rem);font-weight:bold;color:var(--accent)"></div>
+        <div style="font-size:0.95rem;color:var(--subtext);margin:8px 0">Hazır olduğunda başla!</div>
+        <button onclick="beginPlayerTurn()" style="margin-top:12px;padding:14px 40px;background:var(--accent);color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:bold;cursor:pointer">▶ BAŞLA</button>
+      </div>
+    </div>
+    <div id="duelGame" style="display:none;" class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div id="duelPlayerLabel" style="font-size:0.9rem;font-weight:bold;color:var(--accent)"></div>
+        <div id="duelProg" style="font-size:0.9rem;color:var(--subtext)"></div>
+        <div id="duelTimer" style="font-size:1.2rem;font-weight:bold;color:var(--accent);min-width:36px;text-align:right"></div>
+      </div>
+      <div style="margin-bottom:10px"><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div id="duelTimerBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width .1s linear;width:100%"></div></div></div>
+      <div style="font-size:0.85rem;color:var(--subtext);font-weight:bold;margin-bottom:4px" id="duelQLabel">🔤 İNGİLİZCE</div>
+      <div id="duelWord" style="font-size:clamp(1.3rem,5vw,1.8rem);font-weight:bold;margin:8px 0 14px;line-height:1.3"></div>
+      <div style="font-size:0.85rem;color:var(--subtext);font-weight:bold;margin-bottom:8px" id="duelALabel">▼ TÜRKÇE KARŞILIĞI ▼</div>
+      <div id="duelOpts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+    </div>
+    <div id="duelResult" style="display:none;" class="card">
+      <div style="text-align:center;margin-bottom:16px">
+        <div id="duelWinnerIcon" style="font-size:3rem;margin-bottom:8px"></div>
+        <div id="duelWinnerText" style="font-size:1.3rem;font-weight:bold;color:var(--accent)"></div>
+      </div>
+      <div id="duelScoreBoard" style="margin-bottom:16px"></div>
+      <button onclick="initDuel()" style="width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:bold;cursor:pointer">🔄 YENİDEN OYNA</button>
+    </div>
+  </div>
+</div>
+
+<div class="container screen" id="gameScreen">
+  <div class="game-top">
+    <div id="prog" style="color:var(--accent)"></div>
+    <div id="streakBadge" class="streak-badge">🔥 0</div>
+    <div id="errCounter" style="color:var(--error)"></div>
+  </div>
+  <div class="timer-row" id="tRow" style="display:none;">
+    <div class="timer-cont"><div id="timerBar"></div></div>
+    <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸</button>
+  </div>
+  <div class="question-label" id="questionLabel">SORU</div>
+  <div class="word-display" id="qWord">...</div>
+  <div class="answer-label" id="answerLabel">▼ DOĞRU CEVABI SEÇ ▼</div>
+  <div id="optBox"></div>
+  <button id="manualNext" onclick="next()">⚠️ SÜRE BİTTİ! DEVAM ET</button>
+</div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3>✏️ Kelimeyi Düzenle</h3>
+    <input id="editEn" placeholder="İngilizce">
+    <input id="editTr" placeholder="Türkçe">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeEdit()">İptal</button>
+      <button class="btn btn-main" onclick="saveEdit()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- app-wrapper -->
+
+<script>
+// ============================================================
+// IndexedDB KATMANI
+// ============================================================
+const IDB = {
+  DB_NAME: 'alan12', DB_VER: 1, STORE: 'words', META: 'meta',
+  open() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open(this.DB_NAME, this.DB_VER);
+      req.onupgradeneeded = e => {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains(this.STORE)) d.createObjectStore(this.STORE, {keyPath:'en'});
+        if (!d.objectStoreNames.contains(this.META))  d.createObjectStore(this.META);
+      };
+      req.onsuccess = e => res(e.target.result);
+      req.onerror  = e => rej(e.target.error);
+    });
+  },
+  async getMeta(k) {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const r=d.transaction(this.META,'readonly').objectStore(this.META).get(k); r.onsuccess=e=>res(e.target.result); r.onerror=e=>rej(e.target.error); });
+  },
+  async setMeta(k,v) {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const tx=d.transaction(this.META,'readwrite'); tx.objectStore(this.META).put(v,k); tx.oncomplete=()=>res(); tx.onerror=e=>rej(e.target.error); });
+  },
+  async bulkPut(words) {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const tx=d.transaction(this.STORE,'readwrite'); const s=tx.objectStore(this.STORE); words.forEach(w=>s.put(w)); tx.oncomplete=()=>res(); tx.onerror=e=>rej(e.target.error); });
+  },
+  async getAll() {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const r=d.transaction(this.STORE,'readonly').objectStore(this.STORE).getAll(); r.onsuccess=e=>res(e.target.result); r.onerror=e=>rej(e.target.error); });
+  },
+  async count() {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const r=d.transaction(this.STORE,'readonly').objectStore(this.STORE).count(); r.onsuccess=e=>res(e.target.result); r.onerror=e=>rej(e.target.error); });
+  },
+  async put(w) {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const tx=d.transaction(this.STORE,'readwrite'); tx.objectStore(this.STORE).put(w); tx.oncomplete=()=>res(); tx.onerror=e=>rej(e.target.error); });
+  },
+  async delete(en) {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const tx=d.transaction(this.STORE,'readwrite'); tx.objectStore(this.STORE).delete(en); tx.oncomplete=()=>res(); tx.onerror=e=>rej(e.target.error); });
+  },
+  async clear() {
+    const d = await this.open();
+    return new Promise((res,rej)=>{ const tx=d.transaction(this.STORE,'readwrite'); tx.objectStore(this.STORE).clear(); tx.oncomplete=()=>res(); tx.onerror=e=>rej(e.target.error); });
+  }
+};
+
+// ============================================================
+// UYGULAMA DEĞİŞKENLERİ
+// ============================================================
+let db = [];         // aktif kelime listesi (RAM'de)
+let fails = [];
+let appMode = 'learn';
+let difficulty = 'easy';
+let questions = [];
+let idx = 0;
+let errors = 0;
+let streak = 0;
+let isPaused = false;
+let timerInterval = null;
+let soundOn = true;
+let deferredPrompt = null;
+
+// Virtual scroll için
+let wlPage = 0;
+const WL_PAGE_SIZE = 50;
+let wlFiltered = [];
+
+const WORDS_JSON_URL = 'words.json';
+const LS_EXTRA  = 'alan12_extra';   // kullanıcının eklediği kelimeler
+const LS_DONE   = 'alan12_done';
+const LS_FAILS  = 'alan12_fails';
+const LS_STATS  = 'alan12_stats';
+const LS_SOUND  = 'alan12_sound';
+const LS_THEME  = 'alan12_theme';
+
+// ============================================================
+// BAŞLATMA — words.json → IDB → uygulama
+// ============================================================
+async function appStart() {
+  // Tema & ses hemen uygula
+  if (localStorage.getItem(LS_THEME) === 'light') document.body.classList.add('light');
+  soundOn = localStorage.getItem(LS_SOUND) !== 'off';
+  document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  document.getElementById('themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+
+  const setLoadText = t => document.getElementById('loadText').textContent = t;
+
+  try {
+    // words.json versiyonunu kontrol et
+    let remoteVersion = null;
+    try {
+      const vResp = await fetch('version.json?t=' + Date.now());
+      if (vResp.ok) {
+        const vData = await vResp.json();
+        remoteVersion = vData.v;
+      }
+    } catch(e) {}
+
+    const localVersion = await IDB.getMeta('wordsVersion');
+    const count = await IDB.count();
+    const needsReload = count === 0 || (remoteVersion && remoteVersion !== localVersion);
+
+    if (needsReload) {
+      setLoadText(count === 0 ? 'Kelimeler ilk kez yükleniyor...' : 'Kelimeler güncelleniyor...');
+      const resp = await fetch(WORDS_JSON_URL + '?t=' + Date.now());
+      if (!resp.ok) throw new Error('words.json bulunamadı');
+      const builtinWords = await resp.json();
+      setLoadText(`${builtinWords.length} kelime kaydediliyor...`);
+      await IDB.clear();
+      await IDB.bulkPut(builtinWords);
+      await IDB.setMeta('builtinCount', builtinWords.length);
+      if (remoteVersion) await IDB.setMeta('wordsVersion', remoteVersion);
+    }
+
+    // IDB'den tüm kelimeleri yükle
+    setLoadText('Kelimeler hazırlanıyor...');
+    const idbWords = await IDB.getAll();
+
+    // localStorage'daki ekstra kelimeleri de ekle (geriye dönük uyumluluk)
+    const extraRaw = localStorage.getItem(LS_EXTRA);
+    const extraWords = extraRaw ? JSON.parse(extraRaw) : [];
+
+    // Birleştir — IDB zaten hem builtin hem kullanıcı kelimelerini tutar
+    // Sadece IDB kullan (ekstralar artık IDB'ye yazılacak)
+    db = idbWords;
+
+    // Eski localStorage ekstraları IDB'ye taşı (bir kez)
+    if (extraWords.length > 0 && !(await IDB.getMeta('extraMigrated'))) {
+      await IDB.bulkPut(extraWords);
+      db = await IDB.getAll();
+      await IDB.setMeta('extraMigrated', true);
+      localStorage.removeItem(LS_EXTRA);
+    }
+
+    fails = JSON.parse(localStorage.getItem(LS_FAILS) || '[]');
+
+  } catch(e) {
+    setLoadText('Hata: ' + e.message);
+    console.error(e);
+    // Yine de devam et
+    db = [];
+  }
+
+  // Loading ekranını kaldır
+  document.getElementById('loadingScreen').style.display = 'none';
+
+  // UI'yi başlat
+  init();
+  updateStats();
+  fillDayDropdowns();
+
+  // PWA
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('installBtn').style.display = 'block';
+  });
+
+  // Firebase auth
+  if (window.onAuthStateChanged && window.firebaseAuth) {
+    window.onAuthStateChanged(window.firebaseAuth, user => {
+      document.getElementById('login-btn').style.display  = user ? 'none'  : 'block';
+      document.getElementById('logout-btn').style.display = user ? 'block' : 'none';
+      document.getElementById('user-name').textContent    = user ? (user.displayName||user.email||'') : '';
+    });
+  }
+}
+
+// ============================================================
+// INIT — dayPicker doldur
+// ============================================================
+function init() {
+  const p = document.getElementById('dayPicker');
+  p.innerHTML = '';
+  if (!db.length) { p.innerHTML = '<option>ÖNCE VERİ YÜKLEYİN</option>'; return; }
+
+  const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+  for (let i=1; i<=totalDays; i++) {
+    const o = document.createElement('option');
+    o.value = i;
+    const done = JSON.parse(localStorage.getItem(LS_DONE)||'[]');
+    o.innerText = (done.includes(i.toString()) ? '✓ ' : '') + 'GÜN ' + i;
+    p.appendChild(o);
+  }
+
+  if (fails.length > 0) {
+    document.getElementById('failBtn').style.display = 'block';
+    document.getElementById('failBtn').innerText = '❌ HATALAR (' + fails.length + ')';
+  }
+}
+
+function fillDayDropdowns() {
+  const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+  ['duelDay','onlineDuelDay'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '';
+    for (let i=1; i<=totalDays; i++) {
+      const o = document.createElement('option');
+      o.value = i; o.textContent = 'GÜN ' + i;
+      sel.appendChild(o);
+    }
+  });
+}
+
+// ============================================================
+// TAB YÖNETİMİ
+// ============================================================
+function showTab(tab) {
+  ['play','stats','words','data','duel'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = (t===tab) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((b,i) => {
+    b.classList.toggle('active', ['play','stats','words','data','duel'][i]===tab);
+  });
+  if (tab==='stats') updateStats();
+  if (tab==='words') renderWordList();
+}
+
+// ============================================================
+// MOD / ZORLUK
+// ============================================================
+function setMode(m) {
+  appMode = m;
+  ['learn','exam','zen'].forEach(x => document.getElementById('m_'+x).classList.remove('active'));
+  document.getElementById('m_'+m).classList.add('active');
+  document.getElementById('dayPicker').style.display = (m==='zen') ? 'none' : 'block';
+  document.getElementById('startBtn').innerText = (m==='zen') ? '▶ KARMA MODU BAŞLAT' : '▶ DERSİ BAŞLAT';
+}
+
+function setDiff(d) {
+  difficulty = d;
+  document.querySelectorAll('.d-btn').forEach(b => b.classList.toggle('active', b.dataset.d===d));
+}
+
+// ============================================================
+// OYUN BAŞLATMA
+// ============================================================
+function start(m) {
+  if (!db.length && m!=='fails') return alert('Veri yok!');
+  idx=0; errors=0; streak=0; isPaused=false;
+
+  document.getElementById('homeBtn').style.display = 'block';
+  document.getElementById('menuScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.add('active');
+
+  if (m === 'fails') {
+    questions = fails.slice();
+  } else if (m === 'smart') {
+    const failSet = new Set(fails.map(f=>f.en));
+    const done = JSON.parse(localStorage.getItem(LS_DONE)||'[]');
+    let pool = db.filter(w => failSet.has(w.en) || !done.includes((w.day||1).toString()));
+    if (!pool.length) pool = db.slice();
+    questions = shuffle(pool).slice(0, 30);
+  } else {
+    const day = parseInt(document.getElementById('dayPicker').value);
+    if (appMode==='zen') {
+      questions = shuffle(db.slice()).slice(0, 30);
+    } else {
+      questions = shuffle(db.filter(w=>(w.day||1)===day));
+    }
+  }
+
+  if (!questions.length) return alert('Bu gün için kelime yok!');
+  showQuestion();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+// ============================================================
+// SORU GÖSTER
+// ============================================================
+function showQuestion() {
+  if (idx >= questions.length) return endGame();
+
+  clearInterval(timerInterval);
+  document.getElementById('manualNext').style.display = 'none';
+
+  const q = questions[idx];
+  const isEnToTr = Math.random() > 0.5;
+
+  document.getElementById('prog').textContent = (idx+1)+'/'+questions.length;
+  document.getElementById('errCounter').textContent = errors ? '❌ '+errors : '';
+  document.getElementById('streakBadge').style.display = streak>=3 ? 'inline-block' : 'none';
+  document.getElementById('streakBadge').textContent = '🔥 '+streak;
+
+  if (isEnToTr) {
+    document.getElementById('questionLabel').textContent = '🔤 İNGİLİZCE';
+    document.getElementById('qWord').textContent = q.en;
+    document.getElementById('answerLabel').textContent = '▼ TÜRKÇE KARŞILIĞI ▼';
+  } else {
+    document.getElementById('questionLabel').textContent = '🇹🇷 TÜRKÇE';
+    document.getElementById('qWord').textContent = q.tr;
+    document.getElementById('answerLabel').textContent = '▼ İNGİLİZCE KARŞILIĞI ▼';
+  }
+
+  // Seçenekler
+  const pool = db.length >= 4 ? db : questions;
+  const wrong = shuffle(pool.filter(w=>w.en!==q.en)).slice(0,3);
+  const opts = shuffle([q, ...wrong]);
+  const box = document.getElementById('optBox');
+  box.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = isEnToTr ? o.tr : o.en;
+    btn.onclick = () => answer(btn, o.en === q.en, q, isEnToTr);
+    box.appendChild(btn);
+  });
+
+  // Timer
+  const times = {easy:90, mid:50, hard:25, lightning:5};
+  const tRow = document.getElementById('tRow');
+  if (difficulty !== 'easy' || appMode==='exam') {
+    tRow.style.display = 'flex';
+    let t = times[difficulty];
+    const bar = document.getElementById('timerBar');
+    bar.style.width = '100%';
+    if (difficulty==='lightning') document.body.classList.add('lightning-mode');
+    timerInterval = setInterval(() => {
+      if (isPaused) return;
+      t -= 0.1;
+      bar.style.width = Math.max(0,(t/times[difficulty])*100)+'%';
+      if (t <= 0) {
+        clearInterval(timerInterval);
+        timeUp(q);
+      }
+    }, 100);
+  } else {
+    tRow.style.display = 'none';
+  }
+}
+
+function answer(btn, correct, q, isEnToTr) {
+  clearInterval(timerInterval);
+  document.body.classList.remove('lightning-mode');
+  document.querySelectorAll('.opt').forEach(b => b.onclick=null);
+
+  if (correct) {
+    btn.classList.add('correct');
+    streak++;
+    if (soundOn) playSound(true);
+    showMot();
+    // Hatalardan çıkar
+    fails = fails.filter(f=>f.en!==q.en);
+    localStorage.setItem(LS_FAILS, JSON.stringify(fails));
+    setTimeout(()=>{ idx++; showQuestion(); }, appMode==='learn'?800:400);
+  } else {
+    btn.classList.add('wrong');
+    streak = 0;
+    errors++;
+    if (soundOn) playSound(false);
+    // Doğru şıkkı göster
+    document.querySelectorAll('.opt').forEach(b => {
+      if (b.textContent === (isEnToTr ? q.tr : q.en)) b.classList.add('reveal');
+    });
+    // Hatalara ekle
+    if (!fails.find(f=>f.en===q.en)) { fails.push(q); localStorage.setItem(LS_FAILS,JSON.stringify(fails)); }
+    // İstatistik
+    const stats = JSON.parse(localStorage.getItem(LS_STATS)||'{"total":0,"correct":0,"maxStreak":0}');
+    stats.total++; localStorage.setItem(LS_STATS,JSON.stringify(stats));
+
+    if (appMode==='learn') {
+      setTimeout(()=>{ idx++; showQuestion(); }, 1200);
+    } else {
+      document.getElementById('manualNext').style.display = 'block';
+    }
+  }
+
+  // İstatistik güncelle
+  const stats = JSON.parse(localStorage.getItem(LS_STATS)||'{"total":0,"correct":0,"maxStreak":0}');
+  if (correct) { stats.total++; stats.correct++; if (streak>stats.maxStreak) stats.maxStreak=streak; }
+  localStorage.setItem(LS_STATS,JSON.stringify(stats));
+}
+
+function timeUp(q) {
+  document.body.classList.remove('lightning-mode');
+  document.querySelectorAll('.opt').forEach(b => {
+    b.onclick = null;
+    if (b.textContent===q.tr || b.textContent===q.en) b.classList.add('reveal');
+  });
+  streak=0; errors++;
+  if (!fails.find(f=>f.en===q.en)) { fails.push(q); localStorage.setItem(LS_FAILS,JSON.stringify(fails)); }
+  document.getElementById('manualNext').style.display = 'block';
+}
+
+function next() { idx++; showQuestion(); }
+
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? '▶' : '⏸';
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  document.body.classList.remove('lightning-mode');
+
+  // Günü tamamlandı işaretle
+  const dayVal = document.getElementById('dayPicker').value;
+  if (dayVal && appMode!=='zen') {
+    const done = JSON.parse(localStorage.getItem(LS_DONE)||'[]');
+    if (!done.includes(dayVal)) { done.push(dayVal); localStorage.setItem(LS_DONE,JSON.stringify(done)); }
+  }
+
+  goHome();
+  init();
+  updateStats();
+  alert(`✅ Tamamlandı! ${questions.length} soru, ${errors} hata.`);
+}
+
+function goHome() {
+  clearInterval(timerInterval);
+  document.body.classList.remove('lightning-mode');
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('menuScreen').classList.add('active');
+  document.getElementById('homeBtn').style.display = 'none';
+}
+
+// ============================================================
+// WORD LIST — Virtual Scroll
+// ============================================================
+let wlSearchTimeout = null;
+
+function renderWordList() {
+  clearTimeout(wlSearchTimeout);
+  wlSearchTimeout = setTimeout(_renderWordList, 200);
+}
+
+function _renderWordList() {
+  const q = document.getElementById('wordSearch').value.toLowerCase();
+  const dayF = document.getElementById('dayFilter').value;
+
+  wlFiltered = db.filter(w => {
+    const matchDay = !dayF || (w.day||1).toString()===dayF;
+    const matchQ   = !q || w.en.toLowerCase().includes(q) || w.tr.toLowerCase().includes(q);
+    return matchDay && matchQ;
+  });
+
+  document.getElementById('wordCount').textContent = wlFiltered.length + ' kelime';
+
+  // dayFilter seçeneklerini doldur (ilk kez)
+  const df = document.getElementById('dayFilter');
+  if (df.options.length <= 1) {
+    const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+    for (let i=1; i<=totalDays; i++) {
+      const o = document.createElement('option');
+      o.value=i; o.textContent='GÜN '+i;
+      df.appendChild(o);
+    }
+  }
+
+  wlPage = 0;
+  _renderWordPage(true);
+}
+
+function _renderWordPage(reset) {
+  const box = document.getElementById('wordListBox');
+  if (reset) box.innerHTML = '';
+
+  const start = wlPage * WL_PAGE_SIZE;
+  const slice = wlFiltered.slice(start, start + WL_PAGE_SIZE);
+
+  slice.forEach(w => {
+    const div = document.createElement('div');
+    div.className = 'word-list-item';
+    div.innerHTML = `<div><div class="wl-en">${w.en}</div><div class="wl-tr">${w.tr}</div></div>
+      <div>
+        <button class="wl-edit" onclick="openEdit('${w.en.replace(/'/g,"\\'")}')">✏️</button>
+        <button class="wl-del" onclick="deleteWord('${w.en.replace(/'/g,"\\'")}')">🗑️</button>
+      </div>`;
+    box.appendChild(div);
+  });
+
+  const hasMore = (start + WL_PAGE_SIZE) < wlFiltered.length;
+  document.getElementById('wlLoadMore').style.display = hasMore ? 'block' : 'none';
+  wlPage++;
+}
+
+function loadMoreWords() {
+  _renderWordPage(false);
+}
+
+// ============================================================
+// KELİME EKLE / SİL / DÜZENLE
+// ============================================================
+async function saveRaw() {
+  const raw = document.getElementById('rawBox').value.trim();
+  if (!raw) return;
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+  let newDay = totalDays + 1;
+  const newWords = [];
+  lines.forEach(line => {
+    const [en, ...rest] = line.split('=');
+    const tr = rest.join('=').trim();
+    if (en && tr) newWords.push({en:en.trim(), tr, day:newDay});
+  });
+  if (!newWords.length) return alert('Geçersiz format!');
+  await IDB.bulkPut(newWords);
+  db = await IDB.getAll();
+  document.getElementById('rawBox').value = '';
+  init();
+  alert(newWords.length + ' kelime eklendi!');
+}
+
+async function deleteWord(en) {
+  if (!confirm('Silinsin mi? ' + en)) return;
+  await IDB.delete(en);
+  db = db.filter(w=>w.en!==en);
+  renderWordList();
+  init();
+}
+
+let editingEn = null;
+function openEdit(en) {
+  editingEn = en;
+  const w = db.find(x=>x.en===en);
+  if (!w) return;
+  document.getElementById('editEn').value = w.en;
+  document.getElementById('editTr').value = w.tr;
+  document.getElementById('editModal').classList.add('open');
+}
+
+async function saveEdit() {
+  const newEn = document.getElementById('editEn').value.trim();
+  const newTr = document.getElementById('editTr').value.trim();
+  if (!newEn || !newTr) return;
+  const old = db.find(w=>w.en===editingEn);
+  if (!old) return;
+  if (editingEn !== newEn) await IDB.delete(editingEn);
+  const updated = {...old, en:newEn, tr:newTr};
+  await IDB.put(updated);
+  db = await IDB.getAll();
+  closeEdit();
+  renderWordList();
+}
+
+function closeEdit() {
+  document.getElementById('editModal').classList.remove('open');
+  editingEn = null;
+}
+
+// ============================================================
+// YEDEK AL / GERİ YÜKLE
+// ============================================================
+async function getBackup() {
+  const data = JSON.stringify(db, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'alan12_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+async function restoreBackup() {
+  const raw = prompt('JSON içeriğini yapıştır:');
+  if (!raw) return;
+  try {
+    const words = JSON.parse(raw);
+    if (!Array.isArray(words)) throw new Error();
+    await IDB.clear();
+    await IDB.bulkPut(words);
+    db = await IDB.getAll();
+    fails = [];
+    localStorage.setItem(LS_FAILS,'[]');
+    init();
+    alert('Yedek geri yüklendi! ' + words.length + ' kelime.');
+  } catch(e) {
+    alert('Geçersiz JSON!');
+  }
+}
+
+async function clearAll() {
+  if (!confirm('Tüm veri silinsin mi?')) return;
+  await IDB.clear();
+  await IDB.setMeta('builtinCount', 0);
+  db = [];
+  fails = [];
+  localStorage.removeItem(LS_DONE);
+  localStorage.removeItem(LS_FAILS);
+  localStorage.removeItem(LS_STATS);
+  init();
+  alert('Tüm veri silindi.');
+}
+
+// ============================================================
+// İSTATİSTİK
+// ============================================================
+function updateStats() {
+  const stats = JSON.parse(localStorage.getItem(LS_STATS)||'{"total":0,"correct":0,"maxStreak":0}');
+  const done  = JSON.parse(localStorage.getItem(LS_DONE)||'[]');
+  document.getElementById('st-total').textContent  = db.length;
+  document.getElementById('st-done').textContent   = done.length;
+  document.getElementById('st-fails').textContent  = fails.length;
+  document.getElementById('st-streak').textContent = stats.maxStreak||0;
+  const acc = stats.total ? Math.round(stats.correct/stats.total*100) : 0;
+  document.getElementById('st-acc').textContent = acc + '%';
+
+  const totalDays = db.length ? Math.max(...db.map(w=>w.day||1)) : 0;
+  const bar = document.getElementById('st-days-bar');
+  bar.innerHTML = '';
+  for (let i=1;i<=Math.min(totalDays,30);i++) {
+    const isDone = done.includes(i.toString());
+    const bw = document.createElement('div');
+    bw.className='bar-wrap';
+    bw.innerHTML=`<div class="bar-label"><span>GÜN ${i}</span><span>${isDone?'✓':''}</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${isDone?100:0}%;background:${isDone?'var(--success)':'var(--border)'}"></div></div>`;
+    bar.appendChild(bw);
+  }
+}
+
+function clearFails() {
+  if (!confirm('Hatalar temizlensin mi?')) return;
+  fails = [];
+  localStorage.setItem(LS_FAILS,'[]');
+  document.getElementById('failBtn').style.display='none';
+  updateStats();
+}
+
+function resetStats() {
+  if (!confirm('Tüm istatistikler sıfırlansın mı?')) return;
+  localStorage.removeItem(LS_DONE);
+  localStorage.removeItem(LS_FAILS);
+  localStorage.removeItem(LS_STATS);
+  fails = [];
+  updateStats();
+  init();
+}
+
+// ============================================================
+// SES & TEMA & PWA
+// ============================================================
+function playSound(ok) {
+  try {
+    const ctx = new AudioContext();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = ok ? 880 : 220;
+    o.type = ok ? 'sine' : 'sawtooth';
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    o.start(); o.stop(ctx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+function showMot() {
+  const m = document.getElementById('mot');
+  m.textContent = ['🔥','⚡','✨','🎯','💥','🌟'][Math.floor(Math.random()*6)];
+  m.classList.add('show-mot');
+  setTimeout(()=>m.classList.remove('show-mot'), 600);
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem(LS_SOUND, soundOn?'on':'off');
+  document.getElementById('soundBtn').textContent = soundOn?'🔊':'🔇';
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem(LS_THEME, isLight?'light':'dark');
+  document.getElementById('themeBtn').textContent = isLight?'☀️':'🌙';
+}
+
+function installApp() {
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt=null; }
+}
+
+// ============================================================
+// DÜELLO (stub — mevcut kodunla değiştirilecek)
+// ============================================================
+let duelQ=10, onlineDuelQ=10, duelPool='mixed', duelDiffSetting='easy';
+
+function showDuelMode(m) {
+  document.getElementById('duelSetup').style.display = m==='local'?'block':'none';
+  document.getElementById('onlineDuelSetup').style.display = m==='online'?'block':'none';
+}
+function setDuelQ(n) { duelQ=n; document.querySelectorAll('[data-dq]').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.dq)===n)); }
+function setOnlineDuelQ(n) { onlineDuelQ=n; document.querySelectorAll('[data-odq]').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.odq)===n)); }
+function setDuelPool(p) { duelPool=p; document.querySelectorAll('[data-pool]').forEach(b=>b.classList.toggle('active',b.dataset.pool===p)); }
+function setDuelDiff(d) { duelDiffSetting=d; document.querySelectorAll('[data-diff]').forEach(b=>b.classList.toggle('active',b.dataset.diff===d)); }
+
+function startDuel() { alert('Düello: orijinal kodunu buraya entegre et.'); }
+function beginPlayerTurn() {}
+function initDuel() { showDuelMode('local'); }
+function createOnlineRoom() { alert('Online düello: orijinal kodunu buraya entegre et.'); }
+function joinOnlineRoom() {}
+function hostStartGame() {}
+function cancelOnlineRoom() { document.getElementById('onlineWaiting').style.display='none'; document.getElementById('onlineDuelSetup').style.display='block'; }
+
+// ============================================================
+// FIREBASE AUTH
+// ============================================================
+function googleGiris() {
+  if (!window.signInWithPopup) return;
+  window.signInWithPopup(window.firebaseAuth, new window.GoogleAuthProvider());
+}
+function googleCikis() {
+  if (!window.signOut) return;
+  window.signOut(window.firebaseAuth);
+}
+
+// ============================================================
+// BAŞLAT
+// ============================================================
+appStart();
+</script>
+</body>
+</html>
